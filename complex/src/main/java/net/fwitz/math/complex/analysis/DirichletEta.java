@@ -11,13 +11,19 @@ import static net.fwitz.math.complex.Complex.real;
 import static net.fwitz.math.complex.analysis.Gamma.gamma;
 
 public class DirichletEta {
-    private static final int DEFAULT_TERMS_NEAR_1 = 100;
-    private static final int DEFAULT_TERMS = 10;
+    private static final int DEFAULT_TERMS = 16;
+    private static final int DEFAULT_TERMS_BOOST_NEAR_1 = 84;
     private static final double MINUS_PI_OVER_2 = PI / -2;
     private static final Complex CPI = real(PI);
 
     public static Complex eta(Complex s) {
-        final int terms = (Math.abs(s.re() - 1) <= 0.4) ? DEFAULT_TERMS_NEAR_1 : DEFAULT_TERMS;
+        final double closeness = 1.0 - Math.abs(s.re() - 1);
+        int terms = DEFAULT_TERMS;
+        if (closeness > 0.0) {
+            // & ~1 because we need to keep the term count even because we are oscillating as we converge to the
+            // correct value, and the sign flip would cause extra noise
+            terms += ((int) (DEFAULT_TERMS_BOOST_NEAR_1 * closeness)) & ~1;
+        }
         return eta(s, terms);
     }
 
@@ -35,7 +41,7 @@ public class DirichletEta {
             }
         }
 
-        if (s.re() > 4) {
+        if (s.re() > 2) {
             return simpleAlternatingSum(s, terms);
         }
 

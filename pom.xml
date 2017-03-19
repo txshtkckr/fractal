@@ -8,8 +8,9 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>numth</module>
         <module>complex</module>
+        <module>numth</module>
+        <module>plot</module>
     </modules>
 
     <properties>
@@ -23,6 +24,22 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>net.fwitz.math</groupId>
+                <artifactId>complex</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.fwitz.math</groupId>
+                <artifactId>numth</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.fwitz.math</groupId>
+                <artifactId>plot</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>

@@ -1,0 +1,13 @@
+package net.fwitz.math.main.complex.functions.trig;
+
+import net.fwitz.math.plot.FunctionPlot;
+
+public class SinZ2 {
+    public static void main(String[] args) {
+        new FunctionPlot("sin(z^2)")
+                .fn(z -> z.times(z).sin())
+                .domainRe(-Math.PI, Math.PI)
+                .domainIm(-Math.PI, Math.PI)
+                .render();
+    }
+}
