@@ -1,7 +1,7 @@
 package net.fwitz.math.plot.color.escape;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.main.escape.EscapeTimeResult;
+import net.fwitz.math.fractal.escape.EscapeTimeResult;
 
 import java.awt.*;
 

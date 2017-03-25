@@ -1,5 +1,6 @@
 package net.fwitz.math.main.escape;
 
+import net.fwitz.math.fractal.escape.EscapeFunction;
 import net.fwitz.math.plot.color.escape.EscapeTime;
 import net.fwitz.math.plot.complex.escape.EscapeTimePlot;
 

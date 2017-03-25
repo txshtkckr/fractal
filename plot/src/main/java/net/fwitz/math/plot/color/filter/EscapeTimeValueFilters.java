@@ -1,6 +1,6 @@
 package net.fwitz.math.plot.color.filter;
 
-import net.fwitz.math.main.escape.EscapeTimeResult;
+import net.fwitz.math.fractal.escape.EscapeTimeResult;
 
 public class EscapeTimeValueFilters extends ValueFilters<EscapeTimeResult> {
     private static final EscapeTimeValueFilters INSTANCE = new EscapeTimeValueFilters();

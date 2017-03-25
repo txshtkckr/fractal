@@ -1,6 +1,8 @@
 package net.fwitz.math.main.escape;
 
 import net.fwitz.math.complex.Complex;
+import net.fwitz.math.fractal.escape.EscapeFunction;
+import net.fwitz.math.fractal.escape.EscapeTimeResult;
 import net.fwitz.math.plot.color.escape.EscapeTimePaletteFunction;
 import net.fwitz.math.plot.color.palette.PaletteVGA8bitRGB;
 import net.fwitz.math.plot.complex.escape.EscapeTimePanel;
@@ -18,7 +20,6 @@ public class MandelbrotPlot {
     private static final int ITERS = 1000;
 
     private static final EscapeFunction MANDELBROT = EscapeFunction.builder()
-            .init(c -> c)
             .step((c, z) -> z.pow2().plus(c))
             .escapeTest(z -> z.abs() >= 2)
             .maxIters(ITERS)

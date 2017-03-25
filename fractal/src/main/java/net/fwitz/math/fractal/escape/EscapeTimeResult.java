@@ -1,4 +1,4 @@
-package net.fwitz.math.main.escape;
+package net.fwitz.math.fractal.escape;
 
 import net.fwitz.math.complex.Complex;
 
@@ -15,11 +15,11 @@ public class EscapeTimeResult {
         this.z = z;
     }
 
-    static EscapeTimeResult contained(int maxIters, Complex z) {
+    public static EscapeTimeResult contained(int maxIters, Complex z) {
         return new EscapeTimeResult(false, 0, maxIters, z);
     }
 
-    static EscapeTimeResult escaped(int iters, int maxIters, Complex z) {
+    public static EscapeTimeResult escaped(int iters, int maxIters, Complex z) {
         return new EscapeTimeResult(true, iters, maxIters, z);
     }
 

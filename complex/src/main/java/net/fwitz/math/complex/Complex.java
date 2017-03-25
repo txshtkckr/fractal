@@ -1238,7 +1238,13 @@ public class Complex implements Serializable {
 
     @Override
     public String toString() {
-        return "Complex[re=" + Double.toString(this.re) + "; im=" + Double.toString(this.im) + ']';
+        if (Double.isNaN(im)) {
+            return "(" + re + ' ' + im + "i)";
+        }
+        if (im < 0) {
+            return "(" + re + im + "i)";
+        }
+        return "(" + re + '+' + im + "i)";
     }
 
     // Aliased functions from Math class because static importing them would cause name clashes.

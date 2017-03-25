@@ -1,4 +1,4 @@
-package net.fwitz.math.main.escape;
+package net.fwitz.math.fractal.escape;
 
 import net.fwitz.math.complex.Complex;
 
@@ -8,26 +8,29 @@ import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
 
-public class EscapeFunction implements Function<Complex, EscapeTimeResult> {
+class DefaultEscapeFunction implements EscapeFunction {
     private final Function<Complex, Complex> init;
     private final Predicate<Complex> escapeTest;
     private final BiFunction<Complex, Complex, Complex> step;
     private final int maxIters;
+    private final boolean excludeInit;
 
-    private EscapeFunction(Builder builder) {
+    DefaultEscapeFunction(DefaultBuilder builder) {
         this.init = builder.init;
         this.escapeTest = builder.escapeTest;
         this.step = builder.step;
         this.maxIters = builder.maxIters;
+        this.excludeInit = builder.excludeInit;
     }
 
     public EscapeTimeResult apply(Complex c) {
+        int i = excludeInit ? 0 : 1;
         Complex z = init.apply(c);
         if (escapeTest.test(z)) {
-            return EscapeTimeResult.escaped(1, maxIters, z);
+            return EscapeTimeResult.escaped(i, maxIters, z);
         }
 
-        for (int i = 2; i <= maxIters; ++i) {
+        while (++i <= maxIters) {
             z = step.apply(c, z);
             if (escapeTest.test(z)) {
                 return EscapeTimeResult.escaped(i, maxIters, z);
@@ -37,18 +40,19 @@ public class EscapeFunction implements Function<Complex, EscapeTimeResult> {
         return EscapeTimeResult.contained(maxIters, z);
     }
 
-    public static Builder builder() {
-        return new Builder();
+    static Builder builder() {
+        return new DefaultBuilder();
     }
 
 
-    public static class Builder {
-        private Function<Complex, Complex> init = c -> Complex.ZERO;
-        private Predicate<Complex> escapeTest = z -> true;
-        private BiFunction<Complex, Complex, Complex> step = (c, z) -> Complex.POSITIVE_RE_INFINITY;
-        private int maxIters = 1;
+    private static class DefaultBuilder implements Builder {
+        Function<Complex, Complex> init = c -> c;
+        Predicate<Complex> escapeTest = z -> true;
+        BiFunction<Complex, Complex, Complex> step = (c, z) -> Complex.POSITIVE_RE_INFINITY;
+        int maxIters = 1;
+        boolean excludeInit;
 
-        private Builder() {
+        private DefaultBuilder() {
         }
 
         int maxIters() {
@@ -83,10 +87,13 @@ public class EscapeFunction implements Function<Complex, EscapeTimeResult> {
             return this;
         }
 
+        public Builder excludeInit() {
+            this.excludeInit = true;
+            return this;
+        }
+
         public EscapeFunction build() {
-            return new EscapeFunction(this);
+            return new DefaultEscapeFunction(this);
         }
     }
-
 }
-

@@ -1,10 +1,9 @@
 package net.fwitz.math.main.escape;
 
 import net.fwitz.math.complex.Complex;
+import net.fwitz.math.fractal.escape.EscapeFunction;
 import net.fwitz.math.plot.color.escape.EscapeTime;
 import net.fwitz.math.plot.complex.escape.EscapeTimePlot;
-
-import static net.fwitz.math.complex.Complex.complex;
 
 // https://www.flickr.com/photos/fractal_ken/3476756762
 public class SignOfTheSunGod {
@@ -18,20 +17,14 @@ public class SignOfTheSunGod {
     public static void main(String[] args) {
         new EscapeTimePlot("z(n) = 1 / (z(n-1) + z(0))^2 (Escape time)")
                 .computeFn(EscapeFunction.builder()
+                        .init(c -> Complex.ZERO)
+                        .excludeInit()
+                        .step((c, z) -> z.plus(c).pow(-2))
+                        .escapeTest(z -> z.abs() > 10.0)
+                        .maxIters(ITERS)
                         .build())
                 .domainBound(P_MIN, Q_MIN, P_MAX, Q_MAX)
                 .colorFn(new EscapeTime())
                 .render();
-    }
-
-    private static Complex fn(Complex c) {
-        Complex z = Complex.ZERO;
-        for (int i = 1; i <= ITERS; ++i) {
-            z = z.plus(c).pow(-2);
-            if (z.abs() > 10.0) {
-                return complex(i, ITERS);
-            }
-        }
-        return complex(Double.NaN, ITERS);
     }
 }
