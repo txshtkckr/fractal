@@ -9,6 +9,7 @@
 
     <modules>
         <module>complex</module>
+        <module>fractal</module>
         <module>numth</module>
         <module>plot</module>
     </modules>
@@ -27,6 +28,11 @@
             <dependency>
                 <groupId>net.fwitz.math</groupId>
                 <artifactId>complex</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.fwitz.math</groupId>
+                <artifactId>fractal</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

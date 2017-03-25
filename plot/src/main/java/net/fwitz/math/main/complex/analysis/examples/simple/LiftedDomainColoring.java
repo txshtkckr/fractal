@@ -1,7 +1,7 @@
 package net.fwitz.math.main.complex.analysis.examples.simple;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.FunctionPlot;
+import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 
 /**
  * Tasked from Figure 3 of
@@ -10,8 +10,8 @@ import net.fwitz.math.plot.FunctionPlot;
  */
 public class LiftedDomainColoring {
     public static void main(String[] args) {
-        new FunctionPlot("[(z−1)(z+1)^2] / [(z+i)(z−i)^2]")
-                .fn(LiftedDomainColoring::fn)
+        new ComplexFunctionPlot("[(z−1)(z+1)^2] / [(z+i)(z−i)^2]")
+                .computeFn(LiftedDomainColoring::fn)
                 .render();
     }
 

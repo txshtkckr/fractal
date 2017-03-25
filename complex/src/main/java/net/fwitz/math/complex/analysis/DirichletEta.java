@@ -117,34 +117,14 @@ public class DirichletEta {
     }
 
     public static void main(String[] args) {
-        debug(-4, 0);
-        debug(-3.5, 0);
-        debug(-3, 0);
-        debug(-1.5, 0);
-        debug(-1, 0);
-        debug(-0.5, 0);
-        debug(0, 0);
-        debug(0.5, 0);
-        debug(1, 0);
-        debug(1.5, 0);
-        debug(2, 0);
-
-        debug(-4, -0.5);
-        debug(-3.5, -0.5);
-        debug(-3, 0.5);
-        debug(-1.5, 1);
-        debug(-1, 1.5);
-        debug(-0.5, 3);
-        debug(0, 1.5);
-        debug(0.5, 2);
-        debug(1, 1.5);
-        debug(1.5, 0.5);
-        debug(2, -3);
+        final Complex s = complex(0.5, 25.010858);
+        for (int terms = 1; terms <= 20; ++terms) {
+            debug(terms, s);
+        }
     }
 
-    private static void debug(double re, double im) {
-        final Complex s = complex(re, im);
+    private static void debug(int terms, Complex s) {
         final Complex etaS = eta(s);
-        System.out.format("(%10.7f, %10.7f) => (%10.7f, %10.7f)\n", re, im, etaS.re(), etaS.im());
+        System.out.format("%4d: (%10.7f, %10.7f) => (%10.7f, %10.7f)\n", terms, s.re(), s.im(), etaS.re(), etaS.im());
     }
 }

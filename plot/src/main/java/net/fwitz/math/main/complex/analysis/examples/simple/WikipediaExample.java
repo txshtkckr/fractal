@@ -1,8 +1,8 @@
 package net.fwitz.math.main.complex.analysis.examples.simple;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.FunctionPlot;
-import net.fwitz.math.plot.color.domain.DomainColoringSmooth;
+import net.fwitz.math.plot.complex.ComplexFunctionPlot;
+import net.fwitz.math.plot.color.complex.domain.DomainColoringSmooth;
 
 import static net.fwitz.math.complex.Complex.complex;
 
@@ -17,8 +17,8 @@ public class WikipediaExample {
     private static final Complex TWO_PLUS_TWO_I = complex(2, 2);
 
     public static void main(String[] args) {
-        new FunctionPlot("(z^2 - 1)(z - 2 - i)^2 / (z^2 + 2 + 2i)")
-                .fn(WikipediaExample::fn)
+        new ComplexFunctionPlot("(z^2 - 1)(z - 2 - i)^2 / (z^2 + 2 + 2i)")
+                .computeFn(WikipediaExample::fn)
                 .colorFn(new DomainColoringSmooth())
                 .render();
     }

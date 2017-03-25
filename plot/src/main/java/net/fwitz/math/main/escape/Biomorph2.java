@@ -1,10 +1,7 @@
 package net.fwitz.math.main.escape;
 
-import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.FunctionPlot;
 import net.fwitz.math.plot.color.escape.EscapeTime;
-
-import static net.fwitz.math.complex.Complex.complex;
+import net.fwitz.math.plot.complex.escape.EscapeTimePlot;
 
 public class Biomorph2 {
     private static final double P_MIN = -2.0;
@@ -14,21 +11,15 @@ public class Biomorph2 {
     private static final int ITERS = 100;
 
     public static void main(String[] args) {
-        new FunctionPlot("Biomorph2 (Escape time)")
-                .fn(Biomorph2::fn)
+        new EscapeTimePlot("Biomorph2 (Escape time)")
+                .computeFn(EscapeFunction.builder()
+                        .init(c -> c.plus(1))
+                        .step((c, z) -> z.times(z).plus(c).plus(z.cos()))
+                        .escapeTest(z -> z.abs() > 2)
+                        .maxIters(ITERS)
+                        .build())
                 .domainBound(P_MIN, Q_MIN, P_MAX, Q_MAX)
                 .colorFn(new EscapeTime())
                 .render();
-    }
-
-    private static Complex fn(Complex c) {
-        Complex z = Complex.ZERO;
-        for (int i = 1; i <= ITERS; ++i) {
-            z = z.times(z).plus(c).plus(z.cos());
-            if (z.abs() > 2.0) {
-                return complex(i, ITERS);
-            }
-        }
-        return complex(Double.NaN, ITERS);
     }
 }

@@ -1,8 +1,8 @@
-package net.fwitz.math.plot.color.domain;
+package net.fwitz.math.plot.color.complex.domain;
 
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.color.ColorFunction;
+import net.fwitz.math.plot.color.complex.ComplexColorFunction;
 
 import java.awt.*;
 
@@ -10,7 +10,7 @@ import static java.awt.Color.getHSBColor;
 import static java.lang.Math.floor;
 import static java.lang.Math.log;
 
-public class DomainColoringSmooth implements ColorFunction {
+public class DomainColoringSmooth implements ComplexColorFunction {
     private static final double TWO_PI = Math.PI * 2.0;
 
     private static float hue(double arg) {

@@ -1,17 +1,17 @@
 package net.fwitz.math.main.complex.analysis.examples.simple;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.FunctionPlot;
+import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 
 import static java.lang.Math.PI;
 
 // http://www.jedsoft.org/fun/complex/
 public class JedSoftExample1 {
     public static void main(String[] args) {
-        new FunctionPlot("f(z) = [z + z^2 / sin(z^4 - 1)]^2")
+        new ComplexFunctionPlot("f(z) = [z + z^2 / sin(z^4 - 1)]^2")
                 .domainRe(-PI, PI)
                 .domainIm(-PI, PI)
-                .fn(JedSoftExample1::fn)
+                .computeFn(JedSoftExample1::fn)
                 .render();
     }
 

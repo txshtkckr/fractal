@@ -1,4 +1,4 @@
-package net.fwitz.math.plot.color.domain;
+package net.fwitz.math.plot.color.complex.domain;
 
 import net.fwitz.math.complex.Complex;
 

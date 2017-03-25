@@ -3,6 +3,7 @@ package net.fwitz.math.complex;
 import java.io.Serializable;
 import java.util.stream.IntStream;
 
+import static java.lang.Double.POSITIVE_INFINITY;
 import static java.lang.Double.doubleToLongBits;
 import static java.lang.Math.atan2;
 import static java.lang.Math.copySign;
@@ -171,6 +172,16 @@ public class Complex implements Serializable {
     }
 
     /**
+     * Returns this complex number rectified into the first quadrant by taking the absolute value of its
+     * real and imaginary parts independently.
+     *
+     * @return <code>|re| + |im|</code><em>i</em>
+     */
+    public Complex rectify() {
+        return new Complex(rabs(re), rabs(im));
+    }
+
+    /**
      * Returns the multiplicative inverse ("reciprocal") of this complex number, {@code 1/z}.
      */
     public Complex inverse() {
@@ -279,8 +290,77 @@ public class Complex implements Serializable {
      * </ul>
      */
     public Complex times(Complex c) {
-        return new Complex(re * c.re - im * c.im, re * c.im + im * c.re);
+        return times(this, c);
     }
+
+    // The logic and rules applied here are taken loosely from the example in Annex G of the C11 standard
+    // ("IEC 60559-compatible complex arithmetic"), but tweaked for Java's slightly different rules around
+    // infinities and NaN values.
+    private static Complex times(Complex z, Complex w) {
+        double a = z.re;
+        double b = z.im;
+        double c = w.re;
+        double d = w.im;
+        double ac = a * c;
+        double ad = a * d;
+        double bc = b * c;
+        double bd = b * d;
+        double x = ac - bd;
+        double y = ad + bc;
+
+        if (Double.isNaN(x) || Double.isNaN(y)) {
+            boolean recalc = false;
+
+            if (Double.isInfinite(a) || Double.isInfinite(b)) {
+                // "Box" infinity and change NaNs in the other factor to 0
+                a = boxInf(a);
+                b = boxInf(b);
+                c = zeroOutNaN(c);
+                d = zeroOutNaN(d);
+                recalc = true;
+            }
+
+            if (Double.isInfinite(c) || Double.isInfinite(d)) {
+                // "Box" infinity and change NaNs in the other factor to 0
+                a = zeroOutNaN(a);
+                b = zeroOutNaN(b);
+                c = boxInf(c);
+                d = boxInf(d);
+                recalc = true;
+            }
+
+            // If we got a NaN, none of the inputs were infinite, but at least one intermediate term was infinite,
+            // then we need to recover the infinite result by zeroing out NaNs.  (Otherwise, the NaN result is
+            // correct and gets retained.)
+            if (!recalc && (Double.isInfinite(ac)
+                    || Double.isInfinite(ad)
+                    || Double.isInfinite(bc)
+                    || Double.isInfinite(bd))) {
+                a = zeroOutNaN(a);
+                b = zeroOutNaN(b);
+                c = zeroOutNaN(c);
+                d = zeroOutNaN(d);
+                recalc = true;
+            }
+
+            if (recalc) {
+                // recalc now that we have fixed things up
+                x = Double.POSITIVE_INFINITY * (a * c - b * d);
+                y = Double.POSITIVE_INFINITY * (a * d + b * c);
+            }
+        }
+
+        return new Complex(x, y);
+    }
+
+    private static double boxInf(double x) {
+        return copySign(Double.isInfinite(x) ? 1.0 : 0.0, x);
+    }
+
+    private static double zeroOutNaN(double x) {
+        return Double.isNaN(x) ? copySign(0.0, x) : x;
+    }
+
 
     /**
      * Returns the result of dividing this complex value by the real value {@code x}.
@@ -334,21 +414,55 @@ public class Complex implements Serializable {
      * </p>
      */
     public Complex div(Complex c) {
-        double absIm = rabs(c.im());
+        return div(this, c);
+    }
+
+    private static Complex div(Complex z, Complex w) {
+        double absIm = rabs(w.im);
         if (absIm == 0.0) {
-            return div(c.re());
+            return z.div(w.re);
         }
 
-        double absRe = rabs(c.re());
+        double a = z.re;
+        double b = z.im;
+        double c = w.re;
+        double d = w.im;
+
+        double x, y, u, denom;
+        double absRe = rabs(w.re);
         if (absRe < absIm) {
-            double u = c.re() / c.im();
-            double denom = c.re() * u + c.im();
-            return new Complex((re * u + im) / denom, (im * u - re) / denom);
+            u = w.re / w.im;
+            denom = w.re * u + w.im;
+            x = (a * u + b) / denom;
+            y = (b * u - a) / denom;
+        } else {
+            u = w.im / w.re;
+            denom = w.re + w.im * u;
+            x = (a + b * u) / denom;
+            y = (b - a * u) / denom;
         }
 
-        double u = c.im() / c.re();
-        double denom = c.re() + c.im() * u;
-        return new Complex((re + im * u) / denom, (im - re * u) / denom);
+        // Recover infinities and zeros that computed as NaN+iNaN;
+        // the only cases are nonzero/zero, infinite/finite, and finite/infinite, ...
+        if (Double.isNaN(x) && Double.isNaN(y)) {
+            if (denom == 0.0 && (!Double.isNaN(a) || !Double.isNaN(b))) {
+                double inf = copySign(POSITIVE_INFINITY, c);
+                x = inf * a;
+                y = inf * b;
+            } else if ((Double.isInfinite(a) || Double.isInfinite(b)) && Double.isFinite(c) && Double.isFinite(d)) {
+                a = boxInf(a);
+                b = boxInf(b);
+                x = POSITIVE_INFINITY * (a * c + b * d);
+                y = POSITIVE_INFINITY * (b * c - a * d);
+            } else if ((Double.isInfinite(c) || Double.isInfinite(d)) && Double.isFinite(a) && Double.isFinite(b)) {
+                c = boxInf(c);
+                d = boxInf(d);
+                x = 0.0 * (a * c + b * d);
+                y = 0.0 * (b * c - a * d);
+            }
+        }
+
+        return complex(x, y);
     }
 
     //================================================================
@@ -462,6 +576,24 @@ public class Complex implements Serializable {
     }
 
     /**
+     * Shorthand form of {@code z.times(z)} or {@code z.pow(2)}.
+     *
+     * @return {@code z^2}
+     */
+    public Complex pow2() {
+        return times(this);
+    }
+
+    /**
+     * Shorthand form of {@code z.times(z).times(z)} or {@code z.pow(3)}.
+     *
+     * @return {@code z^3}
+     */
+    public Complex pow3() {
+        return times(this).times(this);
+    }
+
+    /**
      * Returns the result of raising this complex number to the given power, {@code z^x}.
      * This function has a branch cut for {@code z} (this complex number) along the negative real axis.
      */
@@ -488,8 +620,8 @@ public class Complex implements Serializable {
      * Returns the result of raising this complex number to the given power, {@code z^c}.
      */
     public Complex pow(Complex c) {
-        if (rabs(c.im()) == 0.0) {
-            return pow(c.re());
+        if (rabs(c.im) == 0.0) {
+            return pow(c.re);
         }
         if (rabs(re) == 0.0 && rabs(im) == 0.0) {
             return ZERO;
@@ -1087,7 +1219,21 @@ public class Complex implements Serializable {
      * @return the complex number corresponding the given polar coordinates.
      */
     public static Complex polar(double r, double theta) {
+        // Ensure we don't end up with -0.0 for either part
+        if (r == 0.0 && !Double.isNaN(theta)) {
+            return ZERO;
+        }
         return new Complex(r * rcos(theta), r * rsin(theta));
+    }
+
+    // compute erfcx(z) = exp(z^2) erfz(z)
+    private static Complex erfcx(Complex z, double relerr) {
+        return w(z.timesI(), relerr);
+    }
+
+    private static Complex w(Complex z, double relerr) {
+        // TODO
+        return null;
     }
 
     @Override

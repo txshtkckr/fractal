@@ -14,7 +14,15 @@
             <groupId>net.fwitz.math</groupId>
             <artifactId>complex</artifactId>
         </dependency>
-        
+        <dependency>
+            <groupId>net.fwitz.math</groupId>
+            <artifactId>fractal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.fwitz.math</groupId>
+            <artifactId>numth</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

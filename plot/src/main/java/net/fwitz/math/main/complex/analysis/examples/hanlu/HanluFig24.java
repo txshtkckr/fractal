@@ -1,8 +1,8 @@
 package net.fwitz.math.main.complex.analysis.examples.hanlu;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.FunctionPlot;
-import net.fwitz.math.plot.color.domain.DomainColoringHanlu;
+import net.fwitz.math.plot.complex.ComplexFunctionPlot;
+import net.fwitz.math.plot.color.complex.domain.DomainColoringHanlu;
 
 import static net.fwitz.math.complex.Complex.complex;
 
@@ -10,8 +10,8 @@ public class HanluFig24 {
     private static final Complex ONE_PLUS_I = complex(1, 1);
 
     public static void main(String[] args) {
-        new FunctionPlot("(1 + i)sin(z)")
-                .fn(HanluFig24::iter)
+        new ComplexFunctionPlot("(1 + i)sin(z)")
+                .computeFn(HanluFig24::iter)
                 .colorFn(new DomainColoringHanlu())
                 .render();
     }

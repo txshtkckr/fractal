@@ -1,4 +1,4 @@
-package net.fwitz.math.plot.color;
+package net.fwitz.math.plot.color.complex;
 
 import net.fwitz.math.complex.Complex;
 
@@ -6,7 +6,7 @@ import java.awt.*;
 import java.util.function.BiFunction;
 
 @FunctionalInterface
-public interface ColorFunction extends BiFunction<Complex, Complex, Color> {
+public interface ComplexColorFunction extends BiFunction<Complex, Complex, Color> {
     /**
      * Calculate the color for the given input and output values.
      *

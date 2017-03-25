@@ -1,8 +1,8 @@
 package net.fwitz.math.main.escape;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.FunctionPlot;
 import net.fwitz.math.plot.color.escape.EscapeTime;
+import net.fwitz.math.plot.complex.escape.EscapeTimePlot;
 
 import static net.fwitz.math.complex.Complex.complex;
 
@@ -16,8 +16,9 @@ public class SignOfTheSunGod {
     private static final int ITERS = 50;
 
     public static void main(String[] args) {
-        new FunctionPlot("z(n) = 1 / (z(n-1) + z(0))^2 (Escape time)")
-                .fn(SignOfTheSunGod::fn)
+        new EscapeTimePlot("z(n) = 1 / (z(n-1) + z(0))^2 (Escape time)")
+                .computeFn(EscapeFunction.builder()
+                        .build())
                 .domainBound(P_MIN, Q_MIN, P_MAX, Q_MAX)
                 .colorFn(new EscapeTime())
                 .render();

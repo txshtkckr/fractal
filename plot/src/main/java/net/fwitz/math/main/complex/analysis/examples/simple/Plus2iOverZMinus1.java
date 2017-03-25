@@ -1,16 +1,16 @@
 package net.fwitz.math.main.complex.analysis.examples.simple;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.FunctionPlot;
-import net.fwitz.math.plot.color.domain.DomainColoringAdvanced;
+import net.fwitz.math.plot.complex.ComplexFunctionPlot;
+import net.fwitz.math.plot.color.complex.domain.DomainColoringAdvanced;
 
 /**
  * Taken from the same StackOverflow answer that provided the {@link DomainColoringAdvanced} color function.
  */
 public class Plus2iOverZMinus1 {
     public static void main(String[] args) {
-        new FunctionPlot("(z + 2i) / (z - 1)")
-                .fn(Plus2iOverZMinus1::fn)
+        new ComplexFunctionPlot("(z + 2i) / (z - 1)")
+                .computeFn(Plus2iOverZMinus1::fn)
                 .render();
     }
 

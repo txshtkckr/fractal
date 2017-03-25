@@ -1,13 +1,12 @@
-package net.fwitz.math.plot.color.domain;
+package net.fwitz.math.plot.color.complex;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.color.ColorFunction;
 
 import java.awt.*;
 
 import static java.lang.Math.abs;
 
-public class QuadrantColor implements ColorFunction {
+public class QuadrantComplexColor implements ComplexColorFunction {
     public Color apply(Complex c, Complex z) {
         if (abs(z.re()) == 0.0 || abs(z.im()) == 0.0) {
             return Color.BLACK;
