@@ -3,7 +3,7 @@ package net.fwitz.math.plot.complex;
 import net.fwitz.math.complex.Complex;
 import net.fwitz.math.numth.numbers.Randomizer;
 import net.fwitz.math.plot.ImageRenderer;
-import net.fwitz.math.plot.color.filter.ValueFilter;
+import net.fwitz.math.plot.color.filter.ValuesFilter;
 import net.fwitz.math.plot.color.filter.ValueFilters;
 
 import java.lang.reflect.Array;
@@ -20,14 +20,14 @@ public class ComplexFunctionRenderer<V> extends ImageRenderer {
 
     private final Class<V> valueType;
     private final AtomicReferenceArray<V[]> values;
-    private final ValueFilters<V> valueFilters;
+    private final ValueFilters<V> valuesFilters;
     private final AbstractComplexFunctionPanel<V> panel;
 
-    private volatile int valueFilterIndex = -1;
-    private volatile ValueFilter<V> valueFilter = ValueFilter.identity();
+    private volatile int valuesFilterIndex = -1;
+    private volatile ValuesFilter<V> valuesFilter = ValuesFilter.identity();
 
     public ComplexFunctionRenderer(AbstractComplexFunctionPanel<V> panel, Class<V> valueType, int width, int height,
-                                   ValueFilters<V> valueFilters) {
+                                   ValueFilters<V> valuesFilters) {
         super(width, height);
 
         this.panel = requireNonNull(panel, "panel");
@@ -35,7 +35,7 @@ public class ComplexFunctionRenderer<V> extends ImageRenderer {
         this.xScale = partition(width, panel.minRe, panel.maxRe);
         this.yScale = partition(height, panel.maxIm, panel.minIm);  // inverted
         this.values = new AtomicReferenceArray<>(height);
-        this.valueFilters = requireNonNull(valueFilters);
+        this.valuesFilters = requireNonNull(valuesFilters);
     }
 
     public void render() {
@@ -92,14 +92,14 @@ public class ComplexFunctionRenderer<V> extends ImageRenderer {
     }
 
     private int[] calculateRowColors(int y, V[] values) {
-        ValueFilter<V> filter = valueFilter;
         double immPart = yScale[y];
+        final V[] filteredValues = valuesFilter.filter(xScale, immPart, values);
         final int[] colors = new int[xScale.length];
 
         for (int x = 0; x < xScale.length; ++x) {
             final double realPart = xScale[x];
             final Complex c = complex(realPart, immPart);
-            final V value = filter.apply(values[x]);
+            final V value = filteredValues[x];
             colors[x] = panel.colorFunction.apply(c, value).getRGB();
         }
 
@@ -117,19 +117,40 @@ public class ComplexFunctionRenderer<V> extends ImageRenderer {
         panel.repaint();
     }
 
-    void toggleMode() {
-        final int size = valueFilters.size();
+    void filterModeForward() {
+        final int size = valuesFilters.size();
         if (size == 0) {
             return;
         }
 
-        int index = this.valueFilterIndex + 1;
+        int index = this.valuesFilterIndex + 1;
         if (index >= size) {
-            this.valueFilterIndex = -1;
-            this.valueFilter = ValueFilter.identity();
+            this.valuesFilterIndex = -1;
+            this.valuesFilter = ValuesFilter.identity();
         } else {
-            this.valueFilterIndex = index;
-            this.valueFilter = valueFilters.filter(index);
+            this.valuesFilterIndex = index;
+            this.valuesFilter = valuesFilters.filter(index);
+        }
+
+        onColorFunctionChanged();
+    }
+
+    void filterModeBackward() {
+        final int size = valuesFilters.size();
+        if (size == 0) {
+            return;
+        }
+
+        int index = this.valuesFilterIndex - 1;
+        if (index == -1) {
+            this.valuesFilterIndex = -1;
+            this.valuesFilter = ValuesFilter.identity();
+        } else {
+            if (index < 0) {
+                index = size - 1;
+            }
+            this.valuesFilterIndex = index;
+            this.valuesFilter = valuesFilters.filter(index);
         }
 
         onColorFunctionChanged();

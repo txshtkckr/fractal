@@ -108,7 +108,8 @@ public abstract class AbstractComplexFunctionPanel<V>
         final InputMap keyMap = getInputMap();
         keyMap.put(KeyStroke.getKeyStroke('q'), "quit");
         keyMap.put(KeyStroke.getKeyStroke('\u001B'), "quit");
-        keyMap.put(KeyStroke.getKeyStroke('m'), "mode");
+        keyMap.put(KeyStroke.getKeyStroke('m'), "filterModeForward");
+        keyMap.put(KeyStroke.getKeyStroke('M'), "filterModeBackward");
         keyMap.put(KeyStroke.getKeyStroke(']'), "zoomIn");
         keyMap.put(KeyStroke.getKeyStroke('['), "zoomOut");
 
@@ -117,8 +118,10 @@ public abstract class AbstractComplexFunctionPanel<V>
             getRenderer().ifPresent(ImageRenderer::shutdown);
             System.exit(0);
         }));
-        handlers.put("mode", action(e -> getRenderer()
-                .ifPresent(ComplexFunctionRenderer::toggleMode)));
+        handlers.put("filterModeForward", action(e -> getRenderer()
+                .ifPresent(ComplexFunctionRenderer::filterModeForward)));
+        handlers.put("filterModeBackward", action(e -> getRenderer()
+                .ifPresent(ComplexFunctionRenderer::filterModeBackward)));
         handlers.put("zoomIn", action(e -> zoomIn()));
         handlers.put("zoomOut", action(e -> zoomOut()));
     }

@@ -41,8 +41,15 @@ public class DirichletEta {
             }
         }
 
-        if (s.re() > 2) {
-            return simpleAlternatingSum(s, terms);
+        if (s.re() >= 5.6) {
+            return simpleAlternatingSum(s, terms * 2);
+        }
+
+        if (s.re() > 5.4) {
+            // Ensure a smooth blend from the euler accelerated sum to the simple alternating sum
+            double x = (5.6 - s.re()) * 5;
+            return simpleAlternatingSum(s, terms * 2).times(x)
+                    .plus(eulerAcceleratedSum(s, terms).times(1 - x));
         }
 
         if (s.re() > -4) {

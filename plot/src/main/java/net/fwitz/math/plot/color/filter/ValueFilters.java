@@ -7,14 +7,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class ValueFilters<V> {
-    private final List<? extends ValueFilter<V>> filters;
+    private final List<? extends ValuesFilter<V>> filters;
 
     @SafeVarargs
-    public ValueFilters(ValueFilter<V>... filters) {
+    public ValueFilters(ValuesFilter<V>... filters) {
         this(Arrays.asList(filters));
     }
 
-    public ValueFilters(Collection<? extends ValueFilter<V>> filters) {
+    public ValueFilters(Collection<? extends ValuesFilter<V>> filters) {
         this.filters = Collections.unmodifiableList(new ArrayList<>(filters));
     }
 
@@ -22,7 +22,7 @@ public class ValueFilters<V> {
         return filters.size();
     }
 
-    public ValueFilter<V> filter(int index) {
+    public ValuesFilter<V> filter(int index) {
         return filters.get(index);
     }
 

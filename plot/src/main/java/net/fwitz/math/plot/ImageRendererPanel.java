@@ -7,15 +7,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class ImageRendererPanel<R extends ImageRenderer>
         extends JPanel
         implements MouseListener {
+
     private final AtomicReference<R> rendererRef = new AtomicReference<>();
+    private final AtomicBoolean registeredMouseListener = new AtomicBoolean();
 
     protected ImageRendererPanel() {
-        addMouseListener(this);
     }
 
     @Override
@@ -47,6 +49,10 @@ public abstract class ImageRendererPanel<R extends ImageRenderer>
             if (rendererRef.compareAndSet(oldRenderer, renderer)) {
                 if (oldRenderer != null) {
                     oldRenderer.shutdown();
+                }
+
+                if (!registeredMouseListener.getAndSet(true)) {
+                    addMouseListener(this);
                 }
 
                 renderer.render();

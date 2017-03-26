@@ -7,6 +7,8 @@ public class CosZ {
     public static void main(String[] args) {
         new ComplexFunctionPlot("cos(z)")
                 .computeFn(Complex::cos)
+                .domainRe(-Math.PI, Math.PI)
+                .domainIm(-Math.PI, Math.PI)
                 .render();
     }
 }

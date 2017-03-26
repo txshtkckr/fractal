@@ -19,7 +19,7 @@ public class RiemannZeta {
             return Complex.POSITIVE_RE_INFINITY;
         }
 
-        if (s.re() > 0) {
+        if (s.re() >= 0) {
             return scaledEtaFunction(s);
         }
 
