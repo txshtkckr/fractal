@@ -11,7 +11,7 @@ import static java.lang.Math.floor;
  * Maps a complex value whose real value is the escape time and imaginary value is the final {@code |z|}
  * onto an escape time color plot.  Use {@code NaN} as the value if it had not escaped after the full iteration.
  */
-public class EscapeTime implements EscapeTimeColorFunction {
+public class EscapeTimeColor implements EscapeTimeColorFunction {
     private static float hue(int iters) {
         double hue = iters / 100.0;
         return (float) (hue - floor(hue));

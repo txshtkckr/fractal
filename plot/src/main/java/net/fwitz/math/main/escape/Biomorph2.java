@@ -1,7 +1,7 @@
 package net.fwitz.math.main.escape;
 
 import net.fwitz.math.fractal.escape.EscapeFunction;
-import net.fwitz.math.plot.color.escape.EscapeTime;
+import net.fwitz.math.plot.color.escape.EscapeTimeColor;
 import net.fwitz.math.plot.complex.escape.EscapeTimePlot;
 
 public class Biomorph2 {
@@ -20,7 +20,7 @@ public class Biomorph2 {
                         .maxIters(ITERS)
                         .build())
                 .domainBound(P_MIN, Q_MIN, P_MAX, Q_MAX)
-                .colorFn(new EscapeTime())
+                .colorFn(new EscapeTimeColor())
                 .render();
     }
 }

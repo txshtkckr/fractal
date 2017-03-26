@@ -12,7 +12,7 @@ import static net.fwitz.math.fractal.escape.EscapeTimeResult.contained;
 import static net.fwitz.math.fractal.escape.EscapeTimeResult.escaped;
 
 public class HalleysMethod {
-    private static final int DEFAULT_MAX_ITERS = 1000;
+    private static final int DEFAULT_MAX_ITERS = 100;
     private static final double EPSILON = 1e-14;
     private static final double TOLERANCE = 1e-7;
 

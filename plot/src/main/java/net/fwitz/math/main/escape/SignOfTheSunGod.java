@@ -2,7 +2,7 @@ package net.fwitz.math.main.escape;
 
 import net.fwitz.math.complex.Complex;
 import net.fwitz.math.fractal.escape.EscapeFunction;
-import net.fwitz.math.plot.color.escape.EscapeTime;
+import net.fwitz.math.plot.color.escape.EscapeTimeColor;
 import net.fwitz.math.plot.complex.escape.EscapeTimePlot;
 
 // https://www.flickr.com/photos/fractal_ken/3476756762
@@ -24,7 +24,7 @@ public class SignOfTheSunGod {
                         .maxIters(ITERS)
                         .build())
                 .domainBound(P_MIN, Q_MIN, P_MAX, Q_MAX)
-                .colorFn(new EscapeTime())
+                .colorFn(new EscapeTimeColor())
                 .render();
     }
 }

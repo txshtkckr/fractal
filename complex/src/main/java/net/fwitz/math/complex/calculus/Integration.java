@@ -1,4 +1,4 @@
-package net.fwitz.math.complex;
+package net.fwitz.math.complex.calculus;
 
 import java.util.function.DoubleFunction;
 import java.util.stream.IntStream;
@@ -95,7 +95,8 @@ public class Integration {
     }
 
     public static void main(String[] args) {
-        IntStream.of(4, 8, 16, 32, 64, 128, 256, 512, 1024).forEach(Integration::debug);
+        IntStream.of(4, 8, 16, 32, 64, 128, 256, 512, 1024)
+                .forEach(Integration::debug);
     }
 
     private static void debug(int terms) {

@@ -7,15 +7,17 @@ import static java.lang.Math.PI;
 
 // http://www.jedsoft.org/fun/complex/
 public class JedSoftExample1 {
+    public static final String FN_NAME = "f(z) = [z + z^2 / sin(z^4 - 1)]^2";
+
     public static void main(String[] args) {
-        new ComplexFunctionPlot("f(z) = [z + z^2 / sin(z^4 - 1)]^2")
+        new ComplexFunctionPlot(FN_NAME)
                 .domainRe(-PI, PI)
                 .domainIm(-PI, PI)
                 .computeFn(JedSoftExample1::fn)
                 .render();
     }
 
-    private static Complex fn(Complex z) {
+    public static Complex fn(Complex z) {
         Complex z2 = z.times(z);
         Complex z4 = z2.times(z2);
         Complex frac = z2.div(z4.minus(1).sin());

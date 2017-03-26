@@ -1,18 +1,21 @@
 package net.fwitz.math.plot;
 
-import net.fwitz.math.complex.Complex;
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Point2D;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static net.fwitz.math.complex.Complex.complex;
-
-public abstract class ImageRendererPanel<P extends ImageRendererPanel<P, R>, R extends ImageRenderer> extends JPanel {
+public abstract class ImageRendererPanel<R extends ImageRenderer>
+        extends JPanel
+        implements MouseListener {
     private final AtomicReference<R> rendererRef = new AtomicReference<>();
 
     protected ImageRendererPanel() {
+        addMouseListener(this);
     }
 
     @Override
@@ -57,7 +60,7 @@ public abstract class ImageRendererPanel<P extends ImageRendererPanel<P, R>, R e
 
     protected abstract R createRenderer(int width, int height);
 
-    public Optional<Complex> getMouseLocationAsRelativePoint() {
+    public Optional<Point2D.Double> getMouseLocationAsRelativePoint() {
         int width = getWidth();
         int height = getHeight();
         if (width <= 0 || height <= 0) {
@@ -73,7 +76,7 @@ public abstract class ImageRendererPanel<P extends ImageRendererPanel<P, R>, R e
             return Optional.empty();
         }
 
-        Point panelLoc = getLocation();
+        Point panelLoc = getLocationOnScreen();
         double x = (mouseLoc.getX() - panelLoc.getX()) / width;
         double y = (mouseLoc.getY() - panelLoc.getY()) / height;
         if (x < 0 || x > 1 || y < 0 || y > 1) {
@@ -82,7 +85,7 @@ public abstract class ImageRendererPanel<P extends ImageRendererPanel<P, R>, R e
             return Optional.empty();
         }
 
-        return Optional.of(complex(x, y));
+        return Optional.of(new Point2D.Double(x, y));
     }
 
     public void reset() {
@@ -96,5 +99,41 @@ public abstract class ImageRendererPanel<P extends ImageRendererPanel<P, R>, R e
 
     protected static double scaleToBounds(double value, double min, double max) {
         return value * max - value * min + min;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    // Glue code to make AbstractAction suck less by looking like a functional interface
+
+    public static AbstractAction action(ActionHandler handler) {
+        return new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handler.actionPerformed(e);
+            }
+        };
+    }
+
+    @FunctionalInterface
+    public interface ActionHandler {
+        void actionPerformed(ActionEvent e);
     }
 }

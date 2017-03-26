@@ -6,7 +6,6 @@ import net.fwitz.math.plot.ImageRendererPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Optional;
@@ -18,7 +17,7 @@ import static java.util.Objects.requireNonNull;
 import static net.fwitz.math.complex.Complex.complex;
 
 public abstract class AbstractComplexFunctionPanel<V>
-        extends ImageRendererPanel<AbstractComplexFunctionPanel<V>, ComplexFunctionRenderer<V>>
+        extends ImageRendererPanel<ComplexFunctionRenderer<V>>
         implements MouseListener {
 
     protected final Class<V> valueType;
@@ -47,8 +46,8 @@ public abstract class AbstractComplexFunctionPanel<V>
 
     public Optional<Complex> getMouseLocationAsComplexValue() {
         return getMouseLocationAsRelativePoint().map(loc -> complex(
-                scaleToBounds(loc.re(), minRe, maxRe),
-                scaleToBounds(1 - loc.im(), minIm, maxIm)));
+                scaleToBounds(loc.getX(), minRe, maxRe),
+                scaleToBounds(1 - loc.getY(), minIm, maxIm)));
     }
 
     private void setBounds(Complex domainBound1, Complex domainBound2) {
@@ -122,44 +121,10 @@ public abstract class AbstractComplexFunctionPanel<V>
                 .ifPresent(ComplexFunctionRenderer::toggleMode)));
         handlers.put("zoomIn", action(e -> zoomIn()));
         handlers.put("zoomOut", action(e -> zoomOut()));
-
-        addMouseListener(this);
-    }
-
-    // Glue code to make AbstractAction suck less by looking like a functional interface
-
-    public static AbstractAction action(ActionHandler handler) {
-        return new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handler.actionPerformed(e);
-            }
-        };
-    }
-
-    @FunctionalInterface
-    public interface ActionHandler {
-        void actionPerformed(ActionEvent e);
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
         getMouseLocationAsComplexValue().ifPresent(this::center);
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
     }
 }

@@ -2,24 +2,33 @@ package net.fwitz.math.fractal.escape.newton;
 
 import net.fwitz.math.complex.Complex;
 import net.fwitz.math.fractal.escape.EscapeFunction;
-import net.fwitz.math.fractal.escape.EscapeTimeResult;
 
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 import static net.fwitz.math.complex.Complex.complex;
+import static net.fwitz.math.complex.calculus.Derivation.derivative;
 import static net.fwitz.math.fractal.escape.EscapeTimeResult.contained;
 import static net.fwitz.math.fractal.escape.EscapeTimeResult.escaped;
 
 public class NewtonsMethod {
-    private static final int DEFAULT_MAX_ITERS = 1000;
+    private static final int DEFAULT_MAX_ITERS = 100;
     private static final double EPSILON = 1e-14;
     private static final double TOLERANCE = 1e-7;
+
+    public static EscapeFunction newtonsMethod(Function<Complex, Complex> f) {
+        final Function<Complex, Complex> df = derivative(f);
+        return newtonsMethod(f, df, DEFAULT_MAX_ITERS);
+    }
+
+    public static EscapeFunction newtonsMethod(Function<Complex, Complex> f, int maxIters) {
+        final Function<Complex, Complex> df = derivative(f);
+        return newtonsMethod(f, df, maxIters);
+    }
 
     public static EscapeFunction newtonsMethod(Function<Complex, Complex> f, Function<Complex, Complex> df) {
         return newtonsMethod(f, df, DEFAULT_MAX_ITERS);
     }
-
     public static EscapeFunction newtonsMethod(Function<Complex, Complex> f, Function<Complex, Complex> df, int maxIters) {
         requireNonNull(f, "f");
         requireNonNull(df, "df");
@@ -65,11 +74,13 @@ public class NewtonsMethod {
     }
 
     private static void debug(double re, double im) {
-        final EscapeFunction ef = newtonsMethod(
-                z -> z.pow3().minus(1),
-                z -> z.pow2().times(3));
+        // Supply the actual derivative
+        final EscapeFunction ef1 = newtonsMethod(z -> z.pow3().minus(1), z -> z.pow2().times(3));
+        // Use a numerical approximation for the derivative
+        final EscapeFunction ef2 = newtonsMethod(z -> z.pow3().minus(1));
+
         final Complex c = complex(re, im);
-        final EscapeTimeResult result = ef.apply(c);
-        System.out.println("c=" + c + " => " + result);
+        System.out.println("c=" + c + " [1] => " + ef1.apply(c));
+        System.out.println("c=" + c + " [2] => " + ef2.apply(c));
     }
 }
