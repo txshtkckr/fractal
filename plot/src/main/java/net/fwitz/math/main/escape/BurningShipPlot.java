@@ -3,6 +3,8 @@ package net.fwitz.math.main.escape;
 import net.fwitz.math.complex.Complex;
 import net.fwitz.math.fractal.escape.EscapeFunction;
 import net.fwitz.math.fractal.escape.EscapeTimeResult;
+import net.fwitz.math.plot.color.escape.EscapeTimePaletteFunction;
+import net.fwitz.math.plot.color.palette.PaletteVGA256;
 import net.fwitz.math.plot.complex.escape.EscapeTimePlot;
 
 import java.util.function.Function;
@@ -14,6 +16,7 @@ public class BurningShipPlot {
     private static final double Q_MAX = 1.5;
     private static final int ITERS = 1000;
     private static final Function<Complex, EscapeTimeResult> BURNING_SHIP = EscapeFunction.builder()
+            .includeInit()
             .containmentTest(z -> z.abs() < 2)
             .step((c, z) -> z.rectify().pow2().plus(c))
             .maxIters(ITERS)
@@ -22,6 +25,7 @@ public class BurningShipPlot {
     public static void main(String[] args) {
         new EscapeTimePlot("Burning Ship (Escape time)")
                 .computeFn(BURNING_SHIP)
+                .colorFn(EscapeTimePaletteFunction.escapeTime(new PaletteVGA256()))
                 .domainBound(P_MIN, Q_MIN, P_MAX, Q_MAX)
                 .render();
     }

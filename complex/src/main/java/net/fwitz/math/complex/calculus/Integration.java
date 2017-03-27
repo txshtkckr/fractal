@@ -66,7 +66,7 @@ public class Integration {
         double prevA = fn.apply(lo);
         double prevB = fn.apply(lo + dx);
 
-        for (int i = 2; i < stop; i+= 2) {
+        for (int i = 2; i < stop; i += 2) {
             double x = lo + i * dx;
             double fx = fn.apply(x);
             sum = sum + prevA + prevB * 4 + fx;

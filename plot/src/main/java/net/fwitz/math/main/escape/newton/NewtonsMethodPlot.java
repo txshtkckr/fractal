@@ -17,6 +17,7 @@ public class NewtonsMethodPlot {
         new EscapeTimePlot(name)
                 .computeFn(escapeFn)
                 .domainBound(-3.5, -2.5, 3.5, 2.5)
+                .size(700, 500)
                 .colorFn(new NewtonsMethodDarkZero())
                 .render();
     }

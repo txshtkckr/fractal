@@ -7,13 +7,14 @@ import static java.lang.Math.sqrt;
 
 public class Vector3 {
     public static final Vector3 ZERO = new Vector3(0, 0, 0);
-    
+
     private final double v[];
 
     public Vector3(double... values) {
         this.v = new double[3];
         System.arraycopy(values, 0, v, 0, values.length);
     }
+
     public Vector3(double x, double y, double z) {
         this.v = new double[]{x, y, z};
     }

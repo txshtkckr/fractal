@@ -1,8 +1,8 @@
 package net.fwitz.math.main.complex.analysis.examples.simple;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 import net.fwitz.math.plot.color.complex.domain.DomainColoringSmooth;
+import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 
 import static net.fwitz.math.complex.Complex.complex;
 

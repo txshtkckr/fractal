@@ -354,7 +354,7 @@ public class ComplexTest {
         assertThat(real(0.0).plus(imaginary(-0.0)), cpx(p0(), p0()));
         assertThat(real(-0.0).plus(imaginary(0.0)), cpx(p0(), p0()));
         assertThat(real(-0.0).plus(imaginary(-0.0)), cpx(p0(), p0()));
-        
+
     }
 
     @Test
@@ -379,9 +379,6 @@ public class ComplexTest {
         assertThrows(IllegalArgumentException.class, () -> ONE.roots(-2));
         assertThrows(IllegalArgumentException.class, () -> ONE.roots(Integer.MAX_VALUE));
     }
-
-
-    
 
 
     private static Matcher<Complex> cpx(Matcher<? super Double> reMatcher, Matcher<? super Double> imMatcher) {

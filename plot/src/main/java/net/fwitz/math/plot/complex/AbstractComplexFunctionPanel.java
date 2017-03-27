@@ -36,7 +36,7 @@ public abstract class AbstractComplexFunctionPanel<V>
         this.valueType = requireNonNull(valueType, "valueType");
         this.computeFunction = requireNonNull(plot.computeFn, "computeFn");
         this.colorFunction = requireNonNull(plot.colorFn, "colorFn");
-        
+
         setBounds(plot.domainBound1, plot.domainBound2);
         addListeners();
     }
@@ -45,7 +45,11 @@ public abstract class AbstractComplexFunctionPanel<V>
     protected abstract ComplexFunctionRenderer<V> createRenderer(int width, int height);
 
     public Optional<Complex> getMouseLocationAsComplexValue() {
-        return getMouseLocationAsRelativePoint().map(loc -> complex(
+        return getMouseLocationAsComplexValue(Optional.empty());
+    }
+
+    public Optional<Complex> getMouseLocationAsComplexValue(Optional<MouseEvent> e) {
+        return getMouseLocationAsRelativePoint(e).map(loc -> complex(
                 scaleToBounds(loc.getX(), minRe, maxRe),
                 scaleToBounds(1 - loc.getY(), minIm, maxIm)));
     }
@@ -127,7 +131,10 @@ public abstract class AbstractComplexFunctionPanel<V>
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-        getMouseLocationAsComplexValue().ifPresent(this::center);
+    public void mousePressed(MouseEvent e) {
+        if (e.getButton() == 1) {
+            getMouseLocationAsComplexValue(Optional.of(e))
+                    .ifPresent(this::center);
+        }
     }
 }

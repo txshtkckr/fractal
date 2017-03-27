@@ -1,8 +1,8 @@
 package net.fwitz.math.main.complex.analysis.examples.simple;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 import net.fwitz.math.plot.color.complex.domain.DomainColoringAdvanced;
+import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 
 /**
  * Taken from the same StackOverflow answer that provided the {@link DomainColoringAdvanced} color function.

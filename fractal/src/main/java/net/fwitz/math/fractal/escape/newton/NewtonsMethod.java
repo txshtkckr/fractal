@@ -29,6 +29,7 @@ public class NewtonsMethod {
     public static EscapeFunction newtonsMethod(Function<Complex, Complex> f, Function<Complex, Complex> df) {
         return newtonsMethod(f, df, DEFAULT_MAX_ITERS);
     }
+
     public static EscapeFunction newtonsMethod(Function<Complex, Complex> f, Function<Complex, Complex> df, int maxIters) {
         requireNonNull(f, "f");
         requireNonNull(df, "df");

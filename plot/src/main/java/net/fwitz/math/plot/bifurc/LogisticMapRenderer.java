@@ -95,7 +95,7 @@ public class LogisticMapRenderer extends ImageRenderer {
         float val = 1.0f / values.length;
         int color = new Color(1 - val, val, val / 2).getRGB();
         DoubleStream.of(values)
-                .mapToInt(xn -> height - (int)Math.round((xn - minxn) * xnScale))
+                .mapToInt(xn -> height - (int) Math.round((xn - minxn) * xnScale))
                 .filter(y -> y >= 0 && y < height)
                 .forEach(y -> image.setRGB(x, y, color));
     }

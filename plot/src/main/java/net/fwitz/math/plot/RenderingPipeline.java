@@ -121,7 +121,7 @@ public class RenderingPipeline {
     public boolean isShutdown() {
         return executor.isShutdown();
     }
-    
+
     public void flush() {
         pendingLock.lock();
         try {

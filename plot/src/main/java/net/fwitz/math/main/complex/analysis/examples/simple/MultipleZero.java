@@ -1,7 +1,7 @@
 package net.fwitz.math.main.complex.analysis.examples.simple;
 
-import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 import net.fwitz.math.plot.color.complex.domain.DomainColoringAdvancedPlusLogScale;
+import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 
 public class MultipleZero {
     public static void main(String[] args) {

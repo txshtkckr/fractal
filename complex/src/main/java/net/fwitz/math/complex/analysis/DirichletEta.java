@@ -41,35 +41,11 @@ public class DirichletEta {
             }
         }
 
-        if (s.re() >= 5.6) {
-            return simpleAlternatingSum(s, terms * 2);
-        }
-
-        if (s.re() > 5.4) {
-            // Ensure a smooth blend from the euler accelerated sum to the simple alternating sum
-            double x = (5.6 - s.re()) * 5;
-            return simpleAlternatingSum(s, terms * 2).times(x)
-                    .plus(eulerAcceleratedSum(s, terms).times(1 - x));
-        }
-
         if (s.re() > -4) {
             return eulerAcceleratedSum(s, terms);
         }
 
         return functionalEquation(s, terms);
-    }
-
-    // 1^-s - 2^-s + 3^-s - ...
-    private static Complex simpleAlternatingSum(Complex s, int terms) {
-        Complex minusS = s.negative();
-        boolean negate = false;
-        Complex sum = ZERO;
-        for (int i = 1; i < terms; ++i) {
-            Complex term = real(i).pow(minusS);
-            sum = negate ? sum.minus(term) : sum.plus(term);
-            negate = !negate;
-        }
-        return sum;
     }
 
     private static Complex eulerAcceleratedSum(Complex s, int terms) {

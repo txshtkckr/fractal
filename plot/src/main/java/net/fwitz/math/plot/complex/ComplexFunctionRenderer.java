@@ -3,8 +3,8 @@ package net.fwitz.math.plot.complex;
 import net.fwitz.math.complex.Complex;
 import net.fwitz.math.numth.numbers.Randomizer;
 import net.fwitz.math.plot.ImageRenderer;
+import net.fwitz.math.plot.color.filter.ValuesFilters;
 import net.fwitz.math.plot.color.filter.ValuesFilter;
-import net.fwitz.math.plot.color.filter.ValueFilters;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -20,14 +20,14 @@ public class ComplexFunctionRenderer<V> extends ImageRenderer {
 
     private final Class<V> valueType;
     private final AtomicReferenceArray<V[]> values;
-    private final ValueFilters<V> valuesFilters;
+    private final ValuesFilters<V> valuesFilters;
     private final AbstractComplexFunctionPanel<V> panel;
 
     private volatile int valuesFilterIndex = -1;
     private volatile ValuesFilter<V> valuesFilter = ValuesFilter.identity();
 
     public ComplexFunctionRenderer(AbstractComplexFunctionPanel<V> panel, Class<V> valueType, int width, int height,
-                                   ValueFilters<V> valuesFilters) {
+                                   ValuesFilters<V> valuesFilters) {
         super(width, height);
 
         this.panel = requireNonNull(panel, "panel");

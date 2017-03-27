@@ -77,9 +77,9 @@ public class Matrix4 {
             for (int col = 0; col < 4; col++) {
                 result[(row << 2) + col] =
                         val(row, 0) * other.val(0, col) +
-                        val(row, 1) * other.val(1, col) +
-                        val(row, 2) * other.val(2, col) +
-                        val(row, 3) * other.val(3, col);
+                                val(row, 1) * other.val(1, col) +
+                                val(row, 2) * other.val(2, col) +
+                                val(row, 3) * other.val(3, col);
             }
         }
         return new Matrix4(result);

@@ -8,14 +8,14 @@ import java.util.function.Function;
 import static net.fwitz.math.complex.Complex.imaginary;
 import static net.fwitz.math.complex.Complex.real;
 
-public class ComplexFunctionValueFilters extends ValueFilters<Complex> {
-    private static final ComplexFunctionValueFilters INSTANCE = new ComplexFunctionValueFilters();
+public class ComplexFunctionValuesFilters extends ValuesFilters<Complex> {
+    private static final ComplexFunctionValuesFilters INSTANCE = new ComplexFunctionValuesFilters();
 
-    public static ComplexFunctionValueFilters getInstance() {
+    public static ComplexFunctionValuesFilters getInstance() {
         return INSTANCE;
     }
 
-    private ComplexFunctionValueFilters() {
+    private ComplexFunctionValuesFilters() {
         super(
                 new ValuesFilter<>("Real only", mapEachValue(z -> real(z.re()))),
                 new ValuesFilter<>("Imaginary only", mapEachValue(z -> imaginary(z.im()))),
@@ -31,7 +31,7 @@ public class ComplexFunctionValueFilters extends ValueFilters<Complex> {
     }
 
     private static ValuesFilterFunction<Complex> dz() {
-        return ComplexFunctionValueFilters::derivative;
+        return ComplexFunctionValuesFilters::derivative;
     }
 
     private static ValuesFilterFunction<Complex> d2z() {

@@ -8,7 +8,9 @@ import java.awt.*;
 import static java.lang.Math.floor;
 import static java.lang.Math.log;
 
-/** See http://users.mai.liu.se/hanlu09/complex/domain-coloring.scm */
+/**
+ * See http://users.mai.liu.se/hanlu09/complex/domain-coloring.scm
+ */
 public class DomainColoringHanlu implements ComplexColorFunction {
     private static final double TWO_PI = Math.PI * 2;
     private static final double LN_2 = Math.log(2);

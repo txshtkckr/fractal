@@ -10,21 +10,30 @@ import static java.util.Objects.requireNonNull;
 
 class DefaultEscapeFunction implements EscapeFunction {
     private final Function<Complex, Complex> init;
+    private final Predicate<Complex> shortcutContainmentTest;
     private final Predicate<Complex> escapeTest;
     private final BiFunction<Complex, Complex, Complex> step;
     private final int maxIters;
-    private final boolean excludeInit;
+    private final boolean includeInit;
 
     DefaultEscapeFunction(DefaultBuilder builder) {
         this.init = builder.init;
-        this.escapeTest = builder.escapeTest;
-        this.step = builder.step;
-        this.maxIters = builder.maxIters;
-        this.excludeInit = builder.excludeInit;
+        this.shortcutContainmentTest = builder.shortcutContainmentTest;
+        this.escapeTest = requireNonNull(builder.escapeTest, "escapeTest or containmentTest");
+        this.step = requireNonNull(builder.step, "step");
+        this.maxIters = requireNonNull(builder.maxIters, "maxIters");
+        this.includeInit = builder.includeInit;
     }
 
     public EscapeTimeResult apply(Complex c) {
-        int i = excludeInit ? 0 : 1;
+        // Note that if a shortcut test is used, then the fractal generation is faster, but since no
+        // iterations are performed, the final value is the initial value rather than whatever iteration
+        // would have produced.
+        if (shortcutContainmentTest.test(c)) {
+            return EscapeTimeResult.contained(maxIters, c);
+        }
+
+        int i = includeInit ? 1 : 0;
         Complex z = init.apply(c);
         if (escapeTest.test(z)) {
             return EscapeTimeResult.escaped(i, maxIters, z);
@@ -47,10 +56,12 @@ class DefaultEscapeFunction implements EscapeFunction {
 
     private static class DefaultBuilder implements Builder {
         Function<Complex, Complex> init = c -> c;
-        Predicate<Complex> escapeTest = z -> true;
-        BiFunction<Complex, Complex, Complex> step = (c, z) -> Complex.POSITIVE_RE_INFINITY;
-        int maxIters = 1;
-        boolean excludeInit;
+        Predicate<Complex> shortcutContainmentTest = c -> false;
+        boolean includeInit;
+
+        Predicate<Complex> escapeTest;
+        BiFunction<Complex, Complex, Complex> step;
+        Integer maxIters;
 
         private DefaultBuilder() {
         }
@@ -61,6 +72,12 @@ class DefaultEscapeFunction implements EscapeFunction {
 
         public Builder init(Function<Complex, Complex> init) {
             this.init = requireNonNull(init);
+            return this;
+        }
+
+        @Override
+        public Builder shortcutContainmentTest(Predicate<Complex> shortcutContainmentTest) {
+            this.shortcutContainmentTest = requireNonNull(shortcutContainmentTest);
             return this;
         }
 
@@ -87,8 +104,8 @@ class DefaultEscapeFunction implements EscapeFunction {
             return this;
         }
 
-        public Builder excludeInit() {
-            this.excludeInit = true;
+        public Builder includeInit() {
+            this.includeInit = true;
             return this;
         }
 

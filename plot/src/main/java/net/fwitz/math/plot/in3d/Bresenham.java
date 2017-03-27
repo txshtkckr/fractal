@@ -42,7 +42,7 @@ public class Bresenham {
         int[] bb = new int[b.length];
         IntToInt[] xMap = new IntToInt[a.length];
         int limit = steps - 1;
-        for (int i = 0 ; i < a.length; ++i) {
+        for (int i = 0; i < a.length; ++i) {
             if (a[i] <= b[i]) {
                 aa[i] = a[i];
                 bb[i] = b[i];

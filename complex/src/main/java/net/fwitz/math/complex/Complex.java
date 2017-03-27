@@ -140,8 +140,6 @@ public class Complex implements Serializable {
         if (Double.isInfinite(re) || Double.isInfinite(im)) {
             return Double.POSITIVE_INFINITY;
         }
-
-        // Do we need to worry about precision loss, here?
         return re * re + im * im;
     }
 
@@ -598,7 +596,7 @@ public class Complex implements Serializable {
      * This function has a branch cut for {@code z} (this complex number) along the negative real axis.
      */
     public Complex pow(double x) {
-        if (rabs(x) == 0.0) {
+        if (x == 0.0) {
             return ONE;
         }
         if (x == 1.0) {
@@ -607,7 +605,7 @@ public class Complex implements Serializable {
         if (x == -1.0) {
             return inverse();
         }
-        if (rabs(re) == 0.0 && rabs(im) == 0.0) {
+        if (re == 0.0 && im == 0.0) {
             return ZERO;
         }
 
@@ -620,10 +618,10 @@ public class Complex implements Serializable {
      * Returns the result of raising this complex number to the given power, {@code z^c}.
      */
     public Complex pow(Complex c) {
-        if (rabs(c.im) == 0.0) {
+        if (c.im == 0.0) {
             return pow(c.re);
         }
-        if (rabs(re) == 0.0 && rabs(im) == 0.0) {
+        if (re == 0.0 && im == 0.0) {
             return ZERO;
         }
 
@@ -739,15 +737,6 @@ public class Complex implements Serializable {
         return new Complex(y / (2 * t), copySign(t, im));
     }
 
-    /**
-     * Returns {@code sqrt(1 - z^2)}, a quantity that comes up in inverse trigonometric function.
-     */
-    private Complex sqrt1z() {
-        double xRe = 1.0 - re * re + im * im;
-        double xIm = -2.0 * re * im;
-        return new Complex(xRe, xIm).sqrt();
-    }
-
 
     //================================================================
     // Trigonometric
@@ -757,8 +746,8 @@ public class Complex implements Serializable {
      * Returns the sine of this complex value.
      */
     public Complex sin() {
-        // Handle this special case to make sure we don't return -0.0 as the angle when dealing with real numbers.
-        if (rabs(im) == 0.0) {
+        // Handle this special case to make sure we don't end up with -0.0i when dealing with real numbers.
+        if (im == 0.0) {
             return real(rsin(re));
         }
         return new Complex(rsin(re) * rcosh(im), rcos(re) * rsinh(im));
@@ -768,8 +757,8 @@ public class Complex implements Serializable {
      * Returns the cosine of this complex value.
      */
     public Complex cos() {
-        // Handle this special case to make sure we don't return -0.0 as the angle when dealing with real numbers.
-        if (rabs(im) == 0.0) {
+        // Handle this special case to make sure we don't end up with -0.0i when dealing with real numbers.
+        if (im == 0.0) {
             return real(rcos(re));
         }
         return new Complex(rcos(re) * rcosh(im), rsin(re) * rsinh(-im));
@@ -1150,7 +1139,7 @@ public class Complex implements Serializable {
         if (Double.isInfinite(re) || Double.isInfinite(im)) {
             return POSITIVE_RE_INFINITY;
         }
-        if (rabs(re) == 0.0 && rabs(im) == 0.0) {
+        if (re == 0.0 && im == 0.0) {
             return ZERO;
         }
         return this;

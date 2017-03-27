@@ -18,7 +18,6 @@ public class SignOfTheSunGod {
         new EscapeTimePlot("z(n) = 1 / (z(n-1) + z(0))^2 (Escape time)")
                 .computeFn(EscapeFunction.builder()
                         .init(c -> Complex.ZERO)
-                        .excludeInit()
                         .step((c, z) -> z.plus(c).pow(-2))
                         .escapeTest(z -> z.abs() > 10.0)
                         .maxIters(ITERS)

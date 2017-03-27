@@ -9,7 +9,7 @@ public class MandelFractint {
     // externs
     private int fractype;  // false = mandle, else julia
     private int inside;  // incide color, normally 1 (blue)
-    
+
     // locals
     private long x;
     private long y;

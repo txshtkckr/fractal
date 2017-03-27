@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 public class BifurcLogisticMapFunction {
     private static final int WARM_UP = 900;
     private static final int SAMPLES = 100;
-    
+
     public static double[] evaluate(double r) {
         if (r < 0 || r > 4) {
             return null;

@@ -11,7 +11,7 @@ public interface EscapeTimeColorFunction extends BiFunction<Complex, EscapeTimeR
     /**
      * Calculate the color for the given input value and escape time result.
      *
-     * @param c the input value
+     * @param c      the input value
      * @param result the result of the escape time iteration
      * @return the color to paint
      */

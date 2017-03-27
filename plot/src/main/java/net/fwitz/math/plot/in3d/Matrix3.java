@@ -7,7 +7,7 @@ import static java.lang.Math.sin;
 
 public class Matrix3 {
     public static final Matrix3 IDENTITY = new Matrix3(1, 0, 0, 0, 1, 0, 0, 0, 1);
-    
+
     private Vector3[] values;
 
     private Matrix3(double[] values) {
@@ -55,8 +55,8 @@ public class Matrix3 {
             for (int col = 0; col < 3; col++) {
                 result[row * 3 + col] =
                         this.values[row].index(0) * other.values[0].index(col) +
-                        this.values[row].index(1) * other.values[1].index(col) +
-                        this.values[row].index(2) * other.values[2].index(col);
+                                this.values[row].index(1) * other.values[1].index(col) +
+                                this.values[row].index(2) * other.values[2].index(col);
             }
         }
         return new Matrix3(result);

@@ -41,8 +41,8 @@ public class Triangulator {
         Vertex[] below = points[y + 1];
         triangles[y] = IntStream.range(0, above.length)
                 .mapToObj(x -> Stream.of(
-                    new Triangle(above[x], below[x], above[x + 1]),
-                    new Triangle(above[x + 1], below[x], below[x + 1])))
+                        new Triangle(above[x], below[x], above[x + 1]),
+                        new Triangle(above[x + 1], below[x], below[x + 1])))
                 .flatMap(s -> s)
                 .toArray(Triangle[]::new);
     }

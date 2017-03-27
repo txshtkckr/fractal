@@ -54,7 +54,7 @@ public class DomainColoringAdvanced implements ComplexColorFunction {
     }
 
     private static float f(double x) {
-        final float f = (float)x;
+        final float f = (float) x;
         return (f < 0.0f) ? 0.0f : ((f > 1.0f) ? 1.0f : f);
     }
 }

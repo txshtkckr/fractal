@@ -1,8 +1,8 @@
 package net.fwitz.math.main.complex.analysis.examples.hanlu;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 import net.fwitz.math.plot.color.complex.domain.DomainColoringHanlu;
+import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 
 import static net.fwitz.math.complex.Complex.complex;
 
@@ -16,7 +16,9 @@ public class HanluFig24 {
                 .render();
     }
 
-    /** <a href="http://users.mai.liu.se/hanlu09/complex/domain_coloring.html">Source</a>. */
+    /**
+     * <a href="http://users.mai.liu.se/hanlu09/complex/domain_coloring.html">Source</a>.
+     */
     private static Complex iter(Complex z) {
         for (int i = 1; i <= 5; ++i) {
             z = fn(z);

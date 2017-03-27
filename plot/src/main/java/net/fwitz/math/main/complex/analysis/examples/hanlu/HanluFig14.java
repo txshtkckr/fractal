@@ -1,8 +1,8 @@
 package net.fwitz.math.main.complex.analysis.examples.hanlu;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 import net.fwitz.math.plot.color.complex.domain.DomainColoringHanlu;
+import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 
 import static net.fwitz.math.complex.Complex.complex;
 
@@ -17,7 +17,9 @@ public class HanluFig14 {
                 .render();
     }
 
-    /** <a href="http://users.mai.liu.se/hanlu09/complex/domain_coloring.html">Source</a>. */
+    /**
+     * <a href="http://users.mai.liu.se/hanlu09/complex/domain_coloring.html">Source</a>.
+     */
     private static Complex fn(Complex z) {
         Complex c1 = z.minus(2).pow(2);
         Complex c2 = z.plus(ONE_MINUS_2_I);

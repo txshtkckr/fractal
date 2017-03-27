@@ -6,15 +6,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ValueFilters<V> {
+public class ValuesFilters<V> {
     private final List<? extends ValuesFilter<V>> filters;
 
     @SafeVarargs
-    public ValueFilters(ValuesFilter<V>... filters) {
+    public ValuesFilters(ValuesFilter<V>... filters) {
         this(Arrays.asList(filters));
     }
 
-    public ValueFilters(Collection<? extends ValuesFilter<V>> filters) {
+    public ValuesFilters(Collection<? extends ValuesFilter<V>> filters) {
         this.filters = Collections.unmodifiableList(new ArrayList<>(filters));
     }
 

@@ -5,7 +5,7 @@ import net.fwitz.math.plot.color.complex.domain.DomainColoringAdvanced;
 
 public class ComplexFunctionPlot
         extends AbstractComplexFunctionPlot<ComplexFunctionPlot, ComplexFunctionPanel, Complex> {
-    
+
     public ComplexFunctionPlot(String title) {
         super(title);
         colorFn(new DomainColoringAdvanced());

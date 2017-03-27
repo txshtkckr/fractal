@@ -67,6 +67,10 @@ public abstract class ImageRendererPanel<R extends ImageRenderer>
     protected abstract R createRenderer(int width, int height);
 
     public Optional<Point2D.Double> getMouseLocationAsRelativePoint() {
+        return getMouseLocationAsRelativePoint(Optional.empty());
+    }
+
+    public Optional<Point2D.Double> getMouseLocationAsRelativePoint(Optional<MouseEvent> e) {
         int width = getWidth();
         int height = getHeight();
         if (width <= 0 || height <= 0) {
@@ -75,7 +79,8 @@ public abstract class ImageRendererPanel<R extends ImageRenderer>
             return Optional.empty();
         }
 
-        Point mouseLoc = MouseInfo.getPointerInfo().getLocation();
+        Point mouseLoc = e.map(MouseEvent::getLocationOnScreen)
+                .orElseGet(() -> MouseInfo.getPointerInfo().getLocation());
         if (mouseLoc == null) {
             // Mouse location unknown (moving it too fast?)
             System.err.println("ImageRendererPanel: Mouse location unknown");

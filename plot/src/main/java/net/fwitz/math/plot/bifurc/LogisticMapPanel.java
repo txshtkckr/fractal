@@ -17,7 +17,7 @@ public class LogisticMapPanel extends ImageRendererPanel<LogisticMapRenderer> {
     volatile double maxr;
     volatile double minxn;
     volatile double maxxn;
-    
+
     final DoubleFunction<double[]> computeFn;
 
     public LogisticMapPanel(double minr, double minxn, double maxr, double maxxn, DoubleFunction<double[]> computeFn) {
@@ -69,7 +69,7 @@ public class LogisticMapPanel extends ImageRendererPanel<LogisticMapRenderer> {
         setBounds(rOffset, xnOffset, rOffset + rDelta, xnOffset + xnDelta);
         reset();
     }
-    
+
     private static boolean valid(double... values) {
         return DoubleStream.of(values).allMatch(Double::isFinite);
     }
@@ -100,13 +100,20 @@ public class LogisticMapPanel extends ImageRendererPanel<LogisticMapRenderer> {
     // Glue code to make AbstractAction suck less by looking like a functional interface
 
     public Optional<Point2D.Double> getMouseLocationInMap() {
-        return getMouseLocationAsRelativePoint().map(loc -> new Point2D.Double(
+        return getMouseLocationInMap(Optional.empty());
+    }
+
+    public Optional<Point2D.Double> getMouseLocationInMap(Optional<MouseEvent> e) {
+        return getMouseLocationAsRelativePoint(e).map(loc -> new Point2D.Double(
                 scaleToBounds(loc.getX(), minr, maxr),
                 scaleToBounds(1 - loc.getY(), minxn, maxxn)));
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-        getMouseLocationInMap().ifPresent(this::center);
+    public void mousePressed(MouseEvent e) {
+        if (e.getButton() == 1) {
+            getMouseLocationInMap(Optional.of(e))
+                    .ifPresent(this::center);
+        }
     }
 }

@@ -80,7 +80,7 @@ public class IntSet {
     public String toString() {
         return bits.toString();
     }
-    
+
 
     private class Itr implements PrimitiveIterator.OfInt {
         private int next = bits.nextSetBit(0);

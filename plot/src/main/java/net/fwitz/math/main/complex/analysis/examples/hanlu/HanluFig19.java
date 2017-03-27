@@ -1,7 +1,7 @@
 package net.fwitz.math.main.complex.analysis.examples.hanlu;
 
-import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 import net.fwitz.math.plot.color.complex.domain.DomainColoringHanlu;
+import net.fwitz.math.plot.complex.ComplexFunctionPlot;
 
 public class HanluFig19 {
     public static void main(String[] args) {

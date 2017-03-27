@@ -20,8 +20,10 @@ public class MandelbrotPlot {
     private static final int ITERS = 1000;
 
     private static final EscapeFunction MANDELBROT = EscapeFunction.builder()
+            .includeInit()
             .step((c, z) -> z.pow2().plus(c))
             .escapeTest(z -> z.abs() >= 2)
+            .shortcutContainmentTest(MandelbrotPlot::inMainCardioidOrCircle)
             .maxIters(ITERS)
             .build();
 
@@ -50,7 +52,6 @@ public class MandelbrotPlot {
 
     private static EscapeFunction julia(Complex c) {
         return EscapeFunction.builder()
-                .init(z0 -> z0.pow2().plus(c))
                 .step((z0, z) -> z.pow2().plus(c))
                 .escapeTest(z -> z.abs() > 2)
                 .maxIters(ITERS)
@@ -73,5 +74,25 @@ public class MandelbrotPlot {
     private void addListeners(EscapeTimePanel panel) {
         panel.getInputMap().put(KeyStroke.getKeyStroke('j'), "toggleJulia");
         panel.getActionMap().put("toggleJulia", action(e -> toggleJulia(panel)));
+    }
+
+    // Returns true if c is in the main cardioid or the largest circular bulb to avoid wasting iterations on them.
+    // This is an optimization that greatly reduces the time to render the set when these portions of the set are
+    // included in the picture.  They're also
+    private static boolean inMainCardioidOrCircle(Complex c) {
+        double re = c.re();
+        if (re <= -0.75) {
+            // Check the main circle
+            double q = re + 1;
+            q = q * q + c.im() * c.im();
+            return q < 0.0625;
+        }
+
+        // Check the main cardioid
+        double im = c.im();
+        double q = re - 0.25;
+        q = q * q + im * im;
+        q = q * (q + re - 0.25);
+        return q < 0.25 * im * im;
     }
 }
