@@ -1,7 +1,7 @@
 package net.fwitz.math.plot.complex;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.color.complex.domain.DomainColoringAdvanced;
+import net.fwitz.math.plot.complex.color.DomainColoringAdvanced;
 
 public class ComplexFunctionPlot
         extends AbstractComplexFunctionPlot<ComplexFunctionPlot, ComplexFunctionPanel, Complex> {

@@ -1,7 +1,7 @@
 package net.fwitz.math.plot.bifurc;
 
-import net.fwitz.math.plot.ImageRenderer;
-import net.fwitz.math.plot.ImageRendererPanel;
+import net.fwitz.math.plot.renderer.ImageRenderer;
+import net.fwitz.math.plot.renderer.ImageRendererPanel;
 
 import javax.swing.*;
 import java.awt.event.MouseEvent;

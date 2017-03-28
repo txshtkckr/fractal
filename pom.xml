@@ -12,6 +12,7 @@
         <module>fractal</module>
         <module>numth</module>
         <module>plot</module>
+        <module>main</module>
     </modules>
 
     <properties>
@@ -43,6 +44,11 @@
             <dependency>
                 <groupId>net.fwitz.math</groupId>
                 <artifactId>plot</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.fwitz.math</groupId>
+                <artifactId>main</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

@@ -1,7 +1,7 @@
 package net.fwitz.math.plot.complex;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.color.filter.ComplexFunctionValuesFilters;
+import net.fwitz.math.plot.complex.filter.ComplexFunctionValuesFilters;
 
 public class ComplexFunctionPanel extends AbstractComplexFunctionPanel<Complex> {
     ComplexFunctionPanel(ComplexFunctionPlot plot) {

@@ -1,5 +1,7 @@
 package net.fwitz.math.complex;
 
+import net.fwitz.math.complex.analysis.Erf;
+
 import java.io.Serializable;
 import java.util.stream.IntStream;
 
@@ -7,6 +9,21 @@ import static java.lang.Double.POSITIVE_INFINITY;
 import static java.lang.Double.doubleToLongBits;
 import static java.lang.Math.atan2;
 import static java.lang.Math.copySign;
+import static net.fwitz.math.complex.RealMath.rabs;
+import static net.fwitz.math.complex.RealMath.racos;
+import static net.fwitz.math.complex.RealMath.racosh;
+import static net.fwitz.math.complex.RealMath.rasin;
+import static net.fwitz.math.complex.RealMath.ratan;
+import static net.fwitz.math.complex.RealMath.rcos;
+import static net.fwitz.math.complex.RealMath.rcosh;
+import static net.fwitz.math.complex.RealMath.rexp;
+import static net.fwitz.math.complex.RealMath.rhypot;
+import static net.fwitz.math.complex.RealMath.rlog;
+import static net.fwitz.math.complex.RealMath.rlog1p;
+import static net.fwitz.math.complex.RealMath.rsin;
+import static net.fwitz.math.complex.RealMath.rsinh;
+import static net.fwitz.math.complex.RealMath.rsqrt;
+import static net.fwitz.math.complex.RealMath.rtanh;
 
 /**
  * An immutable complex number.
@@ -57,7 +74,7 @@ public class Complex implements Serializable {
 
     @Override
     public int hashCode() {
-        return Double.hashCode(re) * 31 + Double.hashCode(im);
+        return Double.hashCode(re) * 31 + Double.hashCode(im) + 17;
     }
 
     public boolean equals(Object o) {
@@ -85,7 +102,11 @@ public class Complex implements Serializable {
      * {@link Double#isInfinite(double) infinite}.
      */
     public boolean isInfinite() {
-        return (Double.isInfinite(re) || Double.isInfinite(im)) && !isNaN();
+        if (Double.isInfinite(re)) {
+            return !Double.isNaN(im);
+        }
+
+        return Double.isInfinite(im) && !Double.isNaN(re);
     }
 
     /**
@@ -473,15 +494,15 @@ public class Complex implements Serializable {
     // with a substitution of variables.  First, as signs and which component is which do not matter, let's assume
     // that neither value is 0 and name their absolute values a and b, without worrying just yet about which is which.
     // We can then restructure the expression as follows:
-    //     rlog(sqrt(a^2 + b^2))
-    //     rlog(sqrt(b^2 * (a/b)^2 + b^2))  [ a^2 = b^2 * (a/b)^2 ]
-    //     rlog(sqrt(b^2 * u^2 + b^2))      [ defining u = a/b ]
-    //     rlog(sqrt(b^2 * (u^2 + 1)))      [ factoring out b^2 within the sqrt ]
-    //     rlog(b * sqrt(u^2 + 1))          [ moving the b^2 outside the sqrt as b ]
-    //     rlog(b) + rlog(sqrt(u^2 + 1))    [ log(xy) = log(x) + log(y) ]
-    //     rlog(b) + rlog((u^2 + 1) ^ 0.5)  [ sqrt(x) = x^0.5 ]
-    //     rlog(b) + 0.5 * rlog(u^2 + 1)    [ log(x^y) = y * log(x) ]
-    //     rlog(b) + 0.5 * rlogp1(u^2)      [ logp1(x) = log(1 + x) ]
+    //     log(sqrt(a^2 + b^2))
+    //     log(sqrt(b^2 * (a/b)^2 + b^2))  [ a^2 = b^2 * (a/b)^2 ]
+    //     log(sqrt(b^2 * u^2 + b^2))      [ defining u = a/b ]
+    //     log(sqrt(b^2 * (u^2 + 1)))      [ factoring out b^2 within the sqrt ]
+    //     log(b * sqrt(u^2 + 1))          [ moving the b^2 outside the sqrt as b ]
+    //     log(b) + log(sqrt(u^2 + 1))     [ log(xy) = log(x) + log(y) ]
+    //     log(b) + log((u^2 + 1) ^ 0.5)   [ sqrt(x) = x^0.5 ]
+    //     log(b) + 0.5 * log(u^2 + 1)     [ log(x^y) = y * log(x) ]
+    //     log(b) + 0.5 * logp1(u^2)       [ logp1(x) = log(1 + x) ]
     // log1p yields its best results when values are small, so assign the smaller value to a to ensure that
     // u = a/b <= 1.
 
@@ -489,17 +510,16 @@ public class Complex implements Serializable {
      * Returns the natural logarithm of this complex number's {@link #abs() absolute value}, {@code log |z|}.
      */
     public double logabs() {
-        double absRe = rabs(re);
-        double absIm = rabs(im);
-
-        if (absIm == 0.0) {
-            return rlog(absRe);
+        if (im == 0.0) {
+            return rlog(rabs(re));
         }
 
-        if (absRe == 0.0) {
+        double absIm = rabs(im);
+        if (re == 0.0) {
             return rlog(absIm);
         }
 
+        double absRe = rabs(re);
         if (absRe > absIm) {
             double u = absIm / absRe;
             return rlog(absRe) + 0.5 * rlog1p(u * u);
@@ -1215,14 +1235,21 @@ public class Complex implements Serializable {
         return new Complex(r * rcos(theta), r * rsin(theta));
     }
 
+    /**
+     * @return the {@link SplitComplex} dual for this complex number.
+     * @see SplitComplex#asComplex()
+     */
+    public SplitComplex asSplitComplex() {
+        return SplitComplex.splitComplex(re, im);
+    }
+
     // compute erfcx(z) = exp(z^2) erfz(z)
     private static Complex erfcx(Complex z, double relerr) {
         return w(z.timesI(), relerr);
     }
 
     private static Complex w(Complex z, double relerr) {
-        // TODO
-        return null;
+        return Erf.w(z, relerr);
     }
 
     @Override
@@ -1234,73 +1261,6 @@ public class Complex implements Serializable {
             return "(" + re + im + "i)";
         }
         return "(" + re + '+' + im + "i)";
-    }
-
-    // Aliased functions from Math class because static importing them would cause name clashes.
-    // All are prefixed with 'r' to indicate that they are real-only variants of the methods that we define.
-    // For example, rsqrt's return type is double, so it necessarily returns Double.NaN, not Complex.I.
-    private static double rabs(double a) {
-        return Math.abs(a);
-    }
-
-    private static double racos(double a) {
-        return Math.acos(a);
-    }
-
-    private static double racosh(double a) {
-        return rlog(a + rsqrt(a * a - 1));
-    }
-
-    private static double rasin(double a) {
-        return Math.asin(a);
-    }
-
-    private static double ratan(double a) {
-        return Math.atan(a);
-    }
-
-    private static double rcos(double a) {
-        return Math.cos(a);
-    }
-
-    private static double rcosh(double a) {
-        return Math.cosh(a);
-    }
-
-    private static double rexp(double a) {
-        return Math.exp(a);
-    }
-
-    private static double rhypot(double x, double y) {
-        return Math.hypot(x, y);
-    }
-
-    private static double rlog(double a) {
-        return Math.log(a);
-    }
-
-    private static double rlog1p(double x) {
-        return Math.log1p(x);
-    }
-
-    private static double rsin(double a) {
-        return Math.sin(a);
-    }
-
-    private static double rsinh(double a) {
-        return Math.sinh(a);
-    }
-
-    private static double rsqrt(double a) {
-        return Math.sqrt(a);
-    }
-
-    private static double rtan(double a) {
-        return Math.tan(a);
-    }
-
-    private static double rtanh(double a) {
-        return Math.tanh(a);
     }
 
     public static void main(String[] args) {

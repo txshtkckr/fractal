@@ -1,10 +1,11 @@
-package net.fwitz.math.plot.complex;
+package net.fwitz.math.plot.complex.split;
 
-import net.fwitz.math.complex.Complex;
+
+import net.fwitz.math.complex.SplitComplex;
 import net.fwitz.math.numth.numbers.Randomizer;
 import net.fwitz.math.plot.renderer.ImageRenderer;
-import net.fwitz.math.plot.complex.filter.ValuesFilters;
 import net.fwitz.math.plot.complex.filter.ValuesFilter;
+import net.fwitz.math.plot.complex.filter.ValuesFilters;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -12,28 +13,28 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.stream.IntStream;
 
 import static java.util.Objects.requireNonNull;
-import static net.fwitz.math.complex.Complex.complex;
+import static net.fwitz.math.complex.SplitComplex.splitComplex;
 
-public class ComplexFunctionRenderer<V> extends ImageRenderer {
+public class SplitComplexFunctionRenderer<V> extends ImageRenderer {
     private final double[] xScale;
     private final double[] yScale;
 
     private final Class<V> valueType;
     private final AtomicReferenceArray<V[]> values;
     private final ValuesFilters<V> valuesFilters;
-    private final AbstractComplexFunctionPanel<V> panel;
+    private final AbstractSplitComplexFunctionPanel<V> panel;
 
     private volatile int valuesFilterIndex = -1;
     private volatile ValuesFilter<V> valuesFilter = ValuesFilter.identity();
 
-    public ComplexFunctionRenderer(AbstractComplexFunctionPanel<V> panel, Class<V> valueType, int width, int height,
+    public SplitComplexFunctionRenderer(AbstractSplitComplexFunctionPanel<V> panel, Class<V> valueType, int width, int height,
                                    ValuesFilters<V> valuesFilters) {
         super(width, height);
 
         this.panel = requireNonNull(panel, "panel");
         this.valueType = requireNonNull(valueType, "valueType");
-        this.xScale = partition(width, panel.minRe, panel.maxRe);
-        this.yScale = partition(height, panel.maxIm, panel.minIm);  // inverted
+        this.xScale = partition(width, panel.minX, panel.maxX);
+        this.yScale = partition(height, panel.maxY, panel.minY);  // inverted
         this.values = new AtomicReferenceArray<>(height);
         this.valuesFilters = requireNonNull(valuesFilters);
     }
@@ -82,23 +83,23 @@ public class ComplexFunctionRenderer<V> extends ImageRenderer {
         @SuppressWarnings("unchecked")
         final V[] values = (V[]) Array.newInstance(valueType, xScale.length);
 
-        double immPart = yScale[y];
+        double yPart = yScale[y];
         for (int x = 0; x < xScale.length; ++x) {
-            final double realPart = xScale[x];
-            final Complex z = complex(realPart, immPart);
+            final double xPart = xScale[x];
+            final SplitComplex z = splitComplex(xPart, yPart);
             values[x] = panel.computeFunction.apply(z);
         }
         return values;
     }
 
     private int[] calculateRowColors(int y, V[] values) {
-        double immPart = yScale[y];
-        final V[] filteredValues = valuesFilter.filter(xScale, immPart, values);
+        double yPart = yScale[y];
+        final V[] filteredValues = valuesFilter.filter(xScale, yPart, values);
         final int[] colors = new int[xScale.length];
 
         for (int x = 0; x < xScale.length; ++x) {
-            final double realPart = xScale[x];
-            final Complex c = complex(realPart, immPart);
+            final double xPart = xScale[x];
+            final SplitComplex c = splitComplex(xPart, yPart);
             final V value = filteredValues[x];
             colors[x] = panel.colorFunction.apply(c, value).getRGB();
         }
@@ -162,6 +163,6 @@ public class ComplexFunctionRenderer<V> extends ImageRenderer {
 
     @Override
     public String toString() {
-        return "ComplexFunctionRenderer[" + super.toString() + ']';
+        return "SplitComplexFunctionRenderer[" + super.toString() + ']';
     }
 }

@@ -1,7 +1,7 @@
 package net.fwitz.math.plot.bifurc;
 
 import net.fwitz.math.numth.numbers.Randomizer;
-import net.fwitz.math.plot.ImageRenderer;
+import net.fwitz.math.plot.renderer.ImageRenderer;
 
 import java.awt.*;
 import java.util.Arrays;

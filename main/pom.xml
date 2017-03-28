@@ -1,0 +1,44 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>net.fwitz.math</groupId>
+        <artifactId>math-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>main</artifactId>
+    <description>Math - Main</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.fwitz.math</groupId>
+            <artifactId>complex</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.fwitz.math</groupId>
+            <artifactId>fractal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.fwitz.math</groupId>
+            <artifactId>numth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.fwitz.math</groupId>
+            <artifactId>plot</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
