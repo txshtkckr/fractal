@@ -1,6 +1,6 @@
 package net.fwitz.math.plot.in3d;
 
-import net.fwitz.math.complex.Complex;
+import net.fwitz.math.binary.complex.Complex;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;

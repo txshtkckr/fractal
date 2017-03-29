@@ -1,13 +1,13 @@
 package net.fwitz.math.fractal.escape.newton;
 
-import net.fwitz.math.complex.Complex;
+import net.fwitz.math.binary.complex.Complex;
 import net.fwitz.math.fractal.escape.EscapeFunction;
 
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
-import static net.fwitz.math.complex.Complex.complex;
-import static net.fwitz.math.complex.calculus.Derivation.derivative;
+import static net.fwitz.math.binary.complex.Complex.complex;
+import static net.fwitz.math.calculus.Derivation.derivative;
 import static net.fwitz.math.fractal.escape.EscapeTimeResult.contained;
 import static net.fwitz.math.fractal.escape.EscapeTimeResult.escaped;
 

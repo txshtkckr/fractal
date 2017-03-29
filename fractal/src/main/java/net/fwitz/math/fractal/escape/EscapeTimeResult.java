@@ -1,6 +1,6 @@
 package net.fwitz.math.fractal.escape;
 
-import net.fwitz.math.complex.Complex;
+import net.fwitz.math.binary.complex.Complex;
 
 public class EscapeTimeResult {
     private final boolean escaped;

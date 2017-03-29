@@ -1,6 +1,6 @@
 package net.fwitz.math.plot.binary.complex;
 
-import net.fwitz.math.complex.Complex;
+import net.fwitz.math.binary.complex.Complex;
 import net.fwitz.math.plot.renderer.filter.ValuesFilter;
 import net.fwitz.math.plot.renderer.filter.ValuesFilterFunction;
 import net.fwitz.math.plot.renderer.filter.ValuesFilters;
@@ -8,8 +8,8 @@ import net.fwitz.math.plot.renderer.filter.ValuesFilters;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import static net.fwitz.math.complex.Complex.imaginary;
-import static net.fwitz.math.complex.Complex.real;
+import static net.fwitz.math.binary.complex.Complex.imaginary;
+import static net.fwitz.math.binary.complex.Complex.real;
 
 public class ComplexFunctionValuesFilters extends ValuesFilters<Complex> {
     private static final ComplexFunctionValuesFilters INSTANCE = new ComplexFunctionValuesFilters();

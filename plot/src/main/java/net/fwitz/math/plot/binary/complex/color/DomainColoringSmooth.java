@@ -1,7 +1,7 @@
 package net.fwitz.math.plot.binary.complex.color;
 
 
-import net.fwitz.math.complex.Complex;
+import net.fwitz.math.binary.complex.Complex;
 
 import java.awt.*;
 

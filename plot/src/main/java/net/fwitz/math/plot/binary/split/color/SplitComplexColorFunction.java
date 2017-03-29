@@ -1,6 +1,6 @@
 package net.fwitz.math.plot.binary.split.color;
 
-import net.fwitz.math.complex.SplitComplex;
+import net.fwitz.math.binary.split.SplitComplex;
 
 import java.awt.*;
 import java.util.function.BiFunction;

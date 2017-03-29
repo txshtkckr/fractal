@@ -1,6 +1,6 @@
 package net.fwitz.math.plot.binary.split.color;
 
-import net.fwitz.math.complex.SplitComplex;
+import net.fwitz.math.binary.split.SplitComplex;
 
 import java.awt.*;
 
@@ -8,7 +8,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.exp;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
-import static net.fwitz.math.complex.SplitComplex.splitComplex;
+import static net.fwitz.math.binary.split.SplitComplex.splitComplex;
 
 public class DomainColoringSplit implements SplitComplexColorFunction {
     private static final double TWO_PI = Math.PI * 2.0;

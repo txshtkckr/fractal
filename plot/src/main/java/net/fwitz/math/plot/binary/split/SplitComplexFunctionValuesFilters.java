@@ -1,6 +1,6 @@
 package net.fwitz.math.plot.binary.split;
 
-import net.fwitz.math.complex.SplitComplex;
+import net.fwitz.math.binary.split.SplitComplex;
 import net.fwitz.math.plot.renderer.filter.ValuesFilter;
 import net.fwitz.math.plot.renderer.filter.ValuesFilterFunction;
 import net.fwitz.math.plot.renderer.filter.ValuesFilters;
@@ -8,7 +8,7 @@ import net.fwitz.math.plot.renderer.filter.ValuesFilters;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import static net.fwitz.math.complex.SplitComplex.splitComplex;
+import static net.fwitz.math.binary.split.SplitComplex.splitComplex;
 
 public class SplitComplexFunctionValuesFilters extends ValuesFilters<SplitComplex> {
     private static final SplitComplexFunctionValuesFilters INSTANCE = new SplitComplexFunctionValuesFilters();

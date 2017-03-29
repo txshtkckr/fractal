@@ -1,6 +1,6 @@
 package net.fwitz.math.plot.binary.split;
 
-import net.fwitz.math.complex.SplitComplex;
+import net.fwitz.math.binary.split.SplitComplex;
 import net.fwitz.math.plot.binary.BinaryNumberFunctionPlot;
 import net.fwitz.math.plot.binary.split.color.DomainColoringSplit;
 

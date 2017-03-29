@@ -1,6 +1,6 @@
 package net.fwitz.math.plot.binary.escape;
 
-import net.fwitz.math.complex.BinaryNumber;
+import net.fwitz.math.binary.BinaryNumber;
 import net.fwitz.math.fractal.escape.EscapeTimeResult;
 import net.fwitz.math.plot.binary.BinaryNumberFunctionPanel;
 import net.fwitz.math.plot.binary.BinaryNumberFunctionRenderer;

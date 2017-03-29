@@ -1,6 +1,6 @@
 package net.fwitz.math.plot.binary.escape.color;
 
-import net.fwitz.math.complex.Complex;
+import net.fwitz.math.binary.complex.Complex;
 import net.fwitz.math.fractal.escape.EscapeTimeResult;
 
 import java.awt.*;

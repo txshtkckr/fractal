@@ -1,8 +1,8 @@
 package net.fwitz.math.plot.binary.escape;
 
-import net.fwitz.math.complex.BinaryNumber;
-import net.fwitz.math.complex.Complex;
-import net.fwitz.math.complex.SplitComplex;
+import net.fwitz.math.binary.BinaryNumber;
+import net.fwitz.math.binary.complex.Complex;
+import net.fwitz.math.binary.split.SplitComplex;
 import net.fwitz.math.fractal.escape.EscapeTimeResult;
 import net.fwitz.math.plot.binary.BinaryNumberFunctionPlot;
 

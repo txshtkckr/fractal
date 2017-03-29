@@ -1,6 +1,6 @@
 package net.fwitz.math.plot.binary;
 
-import net.fwitz.math.complex.BinaryNumber;
+import net.fwitz.math.binary.BinaryNumber;
 import net.fwitz.math.numth.numbers.Randomizer;
 import net.fwitz.math.plot.renderer.filter.ValuesFilter;
 import net.fwitz.math.plot.renderer.filter.ValuesFilters;

@@ -1,6 +1,6 @@
 package net.fwitz.math.plot.binary.complex;
 
-import net.fwitz.math.complex.Complex;
+import net.fwitz.math.binary.complex.Complex;
 import net.fwitz.math.plot.binary.BinaryNumberFunctionPlot;
 import net.fwitz.math.plot.binary.complex.color.DomainColoringAdvanced;
 

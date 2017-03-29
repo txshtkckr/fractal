@@ -1,6 +1,6 @@
 package net.fwitz.math.plot.binary;
 
-import net.fwitz.math.complex.BinaryNumber;
+import net.fwitz.math.binary.BinaryNumber;
 
 import javax.swing.*;
 import java.awt.*;
