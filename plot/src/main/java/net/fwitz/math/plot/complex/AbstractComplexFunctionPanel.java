@@ -55,7 +55,7 @@ public abstract class AbstractComplexFunctionPanel<V>
     }
 
     private void setBounds(Complex domainBound1, Complex domainBound2) {
-        setBounds(domainBound1.re(), domainBound1.im(), domainBound2.re(), domainBound2.im());
+        setBounds(domainBound1.x(), domainBound1.y(), domainBound2.x(), domainBound2.y());
     }
 
     private void setBounds(double re1, double im1, double re2, double im2) {
@@ -98,8 +98,8 @@ public abstract class AbstractComplexFunctionPanel<V>
     public void center(Complex z) {
         double xDelta = maxRe - minRe;
         double yDelta = maxIm - minIm;
-        double xOffset = z.re() - xDelta / 2;
-        double yOffset = z.im() - yDelta / 2;
+        double xOffset = z.x() - xDelta / 2;
+        double yOffset = z.y() - yDelta / 2;
         setBounds(xOffset, yOffset, xOffset + xDelta, yOffset + yDelta);
         reset();
     }

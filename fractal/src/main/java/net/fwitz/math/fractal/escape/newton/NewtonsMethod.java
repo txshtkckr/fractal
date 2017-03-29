@@ -40,7 +40,7 @@ public class NewtonsMethod {
         return c -> {
             Complex z = c;
             for (int i = 1; i < maxIters; ++i) {
-                if (!Double.isFinite(z.re()) || !Double.isFinite(z.im())) {
+                if (!Double.isFinite(z.x()) || !Double.isFinite(z.y())) {
                     return contained(maxIters, z);
                 }
 

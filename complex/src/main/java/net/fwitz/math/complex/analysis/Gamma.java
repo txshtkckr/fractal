@@ -28,10 +28,10 @@ public class Gamma {
 
     public static Complex gamma(Complex z) {
         final Complex lnGamma = lnGamma(z);
-        if (lnGamma.re() >= 75.0) {
+        if (lnGamma.x() >= 75.0) {
             return Complex.POSITIVE_RE_INFINITY;
         }
-        if (lnGamma.re() < -200.0) {
+        if (lnGamma.x() < -200.0) {
             return Complex.ZERO;
         }
         return lnGamma.exp();
@@ -39,7 +39,7 @@ public class Gamma {
 
 
     public static double lnGamma(double re) {
-        return lnGamma(re, 0).re();
+        return lnGamma(re, 0).x();
     }
 
     public static Complex lnGamma(double re, double im) {
@@ -48,12 +48,12 @@ public class Gamma {
 
     public static Complex lnGamma(Complex z) {
         // For negative integers, the value is infinite
-        if (z.re() <= 0.0 && z.im() == 0.0 && z.re() == floor(z.re())) {
+        if (z.x() <= 0.0 && z.y() == 0.0 && z.x() == floor(z.x())) {
             return Complex.POSITIVE_RE_INFINITY;
         }
 
         // Use conjugate relationship to avoid working in 3rd or 4th quad directly
-        if (z.im() < 0.0) {
+        if (z.y() < 0.0) {
             return lnGamma(z.conjugate()).conjugate();
         }
 
@@ -64,14 +64,14 @@ public class Gamma {
         // If we are outside this range, then repeatedly apply the relationship
         //    lnGamma(z + 1) = ln(z) + lnGamma(z)
         // Until we are within the allowed domain
-        while (temp.re() < 9.0) {
+        while (temp.x() < 9.0) {
             // Perform lnGamma on a larger value, then subtract the excess ln(z)
             adjust = adjust.minus(temp.log());
             temp = temp.plus(1.0);
         }
 
         // If the value is to the right of the good range for this analysis, then compensate
-        while (temp.re() > 10.0) {
+        while (temp.x() > 10.0) {
             // Perform lnGamma on a smaller value, then add the missing ln(z - 1)
             temp = temp.minus(1.0);
             adjust = adjust.plus(temp.log());

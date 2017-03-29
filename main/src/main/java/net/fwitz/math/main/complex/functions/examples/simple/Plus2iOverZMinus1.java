@@ -15,6 +15,6 @@ public class Plus2iOverZMinus1 {
     }
 
     private static Complex fn(Complex z) {
-        return z.plusI(2).div(z.minus(1));
+        return z.plusY(2).div(z.minus(1));
     }
 }

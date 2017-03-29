@@ -17,7 +17,7 @@ public class DirichletEta {
     private static final Complex CPI = real(PI);
 
     public static Complex eta(Complex s) {
-        final double closeness = 1.0 - Math.abs(s.re() - 1);
+        final double closeness = 1.0 - Math.abs(s.x() - 1);
         int terms = DEFAULT_TERMS;
         if (closeness > 0.0) {
             // & ~1 because we need to keep the term count even because we are oscillating as we converge to the
@@ -34,14 +34,14 @@ public class DirichletEta {
         }
 
         // eta(-2n) = 0
-        if (s.re() < 0 && s.im() == 0) {
-            long reInt = Math.round(s.re());
-            if (s.re() == reInt && (reInt & 1) == 0) {
+        if (s.x() < 0 && s.y() == 0) {
+            long reInt = Math.round(s.x());
+            if (s.x() == reInt && (reInt & 1) == 0) {
                 return ZERO;
             }
         }
 
-        if (s.re() > -4) {
+        if (s.x() > -4) {
             return eulerAcceleratedSum(s, terms);
         }
 
@@ -108,6 +108,6 @@ public class DirichletEta {
 
     private static void debug(int terms, Complex s) {
         final Complex etaS = eta(s);
-        System.out.format("%4d: (%10.7f, %10.7f) => (%10.7f, %10.7f)\n", terms, s.re(), s.im(), etaS.re(), etaS.im());
+        System.out.format("%4d: (%10.7f, %10.7f) => (%10.7f, %10.7f)\n", terms, s.x(), s.y(), etaS.x(), etaS.y());
     }
 }

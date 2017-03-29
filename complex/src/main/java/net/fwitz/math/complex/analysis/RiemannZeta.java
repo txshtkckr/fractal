@@ -19,7 +19,7 @@ public class RiemannZeta {
             return Complex.POSITIVE_RE_INFINITY;
         }
 
-        if (s.re() >= 0) {
+        if (s.x() >= 0) {
             return scaledEtaFunction(s);
         }
 
@@ -35,7 +35,7 @@ public class RiemannZeta {
             return Complex.POSITIVE_RE_INFINITY;
         }
 
-        if (s.re() > 0) {
+        if (s.x() > 0) {
             return scaledEtaFunction(s, terms);
         }
 
@@ -103,7 +103,7 @@ public class RiemannZeta {
             final Complex eta = eta(z, i);
             final Complex zeta = zeta(z, i);
             System.out.format("%4d:  eta(z)=(%10.7f, %10.7f)  zeta(z)=(%10.7f, %10.7f)\n",
-                    i, eta.re(), eta.im(), zeta.re(), zeta.im());
+                    i, eta.x(), eta.y(), zeta.x(), zeta.y());
         }
     }
 }

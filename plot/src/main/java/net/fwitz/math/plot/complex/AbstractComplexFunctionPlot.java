@@ -92,14 +92,14 @@ public abstract class AbstractComplexFunctionPlot<
     }
 
     public final T domainRe(double re1, double re2) {
-        this.domainBound1 = complex(re1, domainBound1.im());
-        this.domainBound2 = complex(re2, domainBound2.im());
+        this.domainBound1 = complex(re1, domainBound1.y());
+        this.domainBound2 = complex(re2, domainBound2.y());
         return self();
     }
 
     public final T domainIm(double im1, double im2) {
-        this.domainBound1 = complex(domainBound1.re(), im1);
-        this.domainBound2 = complex(domainBound2.re(), im2);
+        this.domainBound1 = complex(domainBound1.x(), im1);
+        this.domainBound2 = complex(domainBound2.x(), im2);
         return self();
     }
 

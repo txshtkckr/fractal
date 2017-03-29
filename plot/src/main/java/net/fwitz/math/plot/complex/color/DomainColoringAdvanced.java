@@ -38,7 +38,7 @@ public class DomainColoringAdvanced implements ComplexColorFunction {
             h += 1.0;
         }
         double s = abs(sin(TWO_PI * z.abs()));
-        double b = sqrt(sqrt(abs(sin(TWO_PI * z.im()) * sin(TWO_PI * z.re()))));
+        double b = sqrt(sqrt(abs(sin(TWO_PI * z.y()) * sin(TWO_PI * z.x()))));
         double oneMsMb = 1.0 - s - b;
         double b2 = 0.5 * ((1 - s) + b + sqrt(oneMsMb * oneMsMb + 0.01));
         return hsb(h, sqrt(s), filterBrightness(b2, z));

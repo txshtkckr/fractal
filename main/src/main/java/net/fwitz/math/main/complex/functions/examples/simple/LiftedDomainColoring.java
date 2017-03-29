@@ -17,6 +17,6 @@ public class LiftedDomainColoring {
 
     private static Complex fn(Complex z) {
         return z.minus(1).times(z.plus(1).pow(2))
-                .div(z.plusI(1).times(z.minusI(1).pow(2)));
+                .div(z.plusY(1).times(z.minusY(1).pow(2)));
     }
 }

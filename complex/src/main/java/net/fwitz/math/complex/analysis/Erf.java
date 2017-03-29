@@ -250,8 +250,8 @@ public class Erf {
     }
 
     public static Complex erf(Complex z, double relerr) {
-        final double x = z.re();
-        final double y = z.im();
+        final double x = z.x();
+        final double y = z.y();
         if (y == 0) {
             return complex(erf(x), y);  // preserve sign of imaginary 0
         }
@@ -287,7 +287,7 @@ public class Erf {
                 /* don't use complex exp function, since that will produce spurious NaN
                    values when multiplying w in an overflow situation. */
                 Complex w = complex(cos(mz2im), sin(mz2im));
-                w = w.times(w(z.timesI(), relerr));
+                w = w.times(w(z.timesY(), relerr));
                 w = w.times(exp(mz2re));
                 return w.negative().plus(1);
             }
@@ -307,7 +307,7 @@ public class Erf {
            values when multiplying w in an overflow situation. */
         return complex(cos(mz2im), sin(mz2im))
                 .times(exp(mz2re))
-                .times(w(z.timesNegativeI(), relerr))
+                .times(w(z.timesNegativeY(), relerr))
                 .minus(1);
     }
 
@@ -354,7 +354,7 @@ public class Erf {
 
     // erfi(z) = -i erf(iz)
     public static Complex erfi(Complex z, double relerr) {
-        return erf(z.timesI(), relerr).timesNegativeI();
+        return erf(z.timesY(), relerr).timesNegativeY();
     }
 
     // erfi(x) = -i erf(ix)
@@ -383,8 +383,8 @@ public class Erf {
 
     // erfc(z) = 1 - erf(z)
     public static Complex erfc(Complex z, double relerr) {
-        final double x = z.re();
-        final double y = z.im();
+        final double x = z.x();
+        final double y = z.y();
         if (x == 0) {
              /* handle y -> Inf limit manually, since
                 exp(y^2) -> Inf but Im[w(y)] -> 0, so
@@ -415,11 +415,11 @@ public class Erf {
 
         if (x >= 0) {
             return complex(mz2re, mz2im).exp()
-                    .times(w(z.timesI(), relerr));
+                    .times(w(z.timesY(), relerr));
         }
 
         return complex(mz2re, mz2im).exp()
-                .times(w(z.timesNegativeI(), relerr))
+                .times(w(z.timesNegativeY(), relerr))
                 .negative().plus(2);
     }
 
@@ -429,8 +429,8 @@ public class Erf {
 
     // compute Dawson(z) = sqrt(pi)/2  *  exp(-z^2) * erfi(z)
     public static Complex dawson(Complex z, double relerr) {
-        double x = z.re();
-        double y = z.im();
+        double x = z.x();
+        double y = z.y();
 
         // handle axes separately for speed & proper handling of x or y = Inf or NaN
         if (y == 0) {
@@ -467,7 +467,7 @@ public class Erf {
                 }
             }
             Complex res = mz2.exp().minus(w(z, relerr));
-            return res.timesI().times(SQRT_PI_OVER_2);
+            return res.timesY().times(SQRT_PI_OVER_2);
         }
 
         // y < 0
@@ -484,7 +484,7 @@ public class Erf {
         }
 
         Complex res = w(z.negative(), relerr).minus(mz2.exp());
-        return res.timesI().times(SQRT_PI_OVER_2);
+        return res.timesY().times(SQRT_PI_OVER_2);
     }
 
     // Use Taylor series for small |z|, to avoid cancellation inaccuracy
@@ -584,10 +584,10 @@ public class Erf {
     }
 
     public static Complex w(Complex z, double relerr) {
-        double x = z.re();
-        double y = z.im();
+        double x = z.x();
+        double y = z.y();
         if (x == 0.0) {
-            return complex(erfcx(y), x);  // give correct sign of 0 in w.im()
+            return complex(erfcx(y), x);  // give correct sign of 0 in w.y()
         }
         if (y == 0.0) {
             return complex(exp(-x * x), wIm(x));
@@ -633,7 +633,7 @@ public class Erf {
                the sum of the squares of the errors in nu with the constraint
                that the estimated nu be >= minimum nu to attain machine precision.
                I also separate the regions where nu == 2 and nu == 1. */
-                double xs = y < 0 ? -z.re() : z.re(); // compute for -z if y < 0
+                double xs = y < 0 ? -z.x() : z.x(); // compute for -z if y < 0
                 if (x + ya > 4000) { // nu <= 2
                     if (x + ya > 1e7) { // nu == 1, w(z) = i/sqrt(pi) / z
                         // scale to avoid overflow
@@ -677,7 +677,7 @@ public class Erf {
             }
         } else {  // !USE_CONTINUED_FRACTION
             if (x + ya > 1e7) { // w(z) = i/sqrt(pi) / z, to machine precision
-                double xs = y < 0 ? -z.re() : z.re(); // compute for -z if y < 0
+                double xs = y < 0 ? -z.x() : z.x(); // compute for -z if y < 0
                 // scale to avoid overflow
                 if (x > ya) {
                     double yax = ya / xs;
@@ -816,7 +816,7 @@ public class Erf {
                 ret = real((expx2erfcxy - c * y * sum1) * cos(2 * x * y)
                         + (c * x * expx2) * sinxy * sinc(x * y, sinxy));
             } else {
-                double xs = z.re();
+                double xs = z.x();
                 final double sinxy = sin(xs * y);
                 final double sin2xy = sin(2 * xs * y), cos2xy = cos(2 * xs * y);
                 final double coef1 = expx2erfcxy - c * y * sum1;
@@ -838,7 +838,7 @@ public class Erf {
                    if y*y - x*x > -36 or so.  So, compute this term just in case.
                    We also need the -exp(-x*x) term to compute Re[w] accurately
                    in the case where y is very small. */
-                    ret = polar(2 * exp(y * y - x * x) - exp(-x * x), -2 * z.re() * y);
+                    ret = polar(2 * exp(y * y - x * x) - exp(-x * x), -2 * z.x() * y);
                 } else {
                     ret = real(exp(-x * x)); // not negligible in real part if y very small
                 }
@@ -880,7 +880,7 @@ public class Erf {
 
         return ret.plus(complex(
                 (0.5 * c) * y * (sum2 + sum3),
-                (0.5 * c) * copySign(sum5 - sum4, z.re())
+                (0.5 * c) * copySign(sum5 - sum4, z.x())
         ));
     }
 
@@ -1345,7 +1345,7 @@ public class Erf {
     }
 
     public static Complex erfcx(Complex z, double relerr) {
-        return w(z.timesI(), relerr);
+        return w(z.timesY(), relerr);
     }
 
     public static double erfcx(double value) {

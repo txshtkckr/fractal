@@ -2,11 +2,9 @@ package net.fwitz.math.complex;
 
 import net.fwitz.math.complex.analysis.Erf;
 
-import java.io.Serializable;
 import java.util.stream.IntStream;
 
 import static java.lang.Double.POSITIVE_INFINITY;
-import static java.lang.Double.doubleToLongBits;
 import static java.lang.Math.atan2;
 import static java.lang.Math.copySign;
 import static net.fwitz.math.complex.RealMath.rabs;
@@ -29,12 +27,12 @@ import static net.fwitz.math.complex.RealMath.rtanh;
  * An immutable complex number.
  * <p>
  * Note that since these values are immutable, a preference has been given to terminology like
- * {@link #plus(Complex) plus} or {@link #times(Complex) times} that connotes an result yielding
+ * {@link #plus(BinaryNumber) plus} or {@link #times(BinaryNumber) times} that connotes an result yielding
  * operation as opposed to {@code add}, which might suggest that the operation is mutative and
- * and encourage mistakes.  As this class is immutable, none of its method will
+ * and encourage mistakes.
  * </p>
  */
-public class Complex implements BinaryNumber<Complex> {
+public class Complex extends BinaryNumber<Complex> {
     /**
      * The maximum number of roots that may be requested using {@link #roots(int)}.
      */
@@ -64,79 +62,41 @@ public class Complex implements BinaryNumber<Complex> {
     private static final double LN_10_RECIP = 1.0 / LN_10;
     private static final Complex ONE_OVER_2_I = imaginary(2).inverse();
 
-    private final double re;
-    private final double im;
+    private final double x;
+    private final double y;
 
-    private Complex(double re, double im) {
-        this.re = re;
-        this.im = im;
-    }
-
-    @Override
-    public int hashCode() {
-        return Double.hashCode(re) * 31 + Double.hashCode(im) + 17;
-    }
-
-    public boolean equals(Object o) {
-        return o == this || (o instanceof Complex && equalTo((Complex) o));
-    }
-
-    private boolean equalTo(Complex c) {
-        return doubleToLongBits(re) == doubleToLongBits(c.re) &&
-                doubleToLongBits(im) == doubleToLongBits(c.im);
+    private Complex(double x, double y) {
+        this.x = x;
+        this.y = y;
     }
 
     //================================================================
-    // Simple properties
+    // BinaryNumber helpers
     //----------------------------------------------------------------
-
-    /**
-     * Returns {@code true} if either {@link #re()} or {@link #im()} is {@link Double#NaN}.
-     */
-    public boolean isNaN() {
-        return Double.isNaN(re) || Double.isNaN(im);
-    }
-
-    /**
-     * Returns {@code true} if {@link #isNaN()} is {@code false} either {@link #re()} or {@link #im()} is
-     * {@link Double#isInfinite(double) infinite}.
-     */
-    public boolean isInfinite() {
-        if (Double.isInfinite(re)) {
-            return !Double.isNaN(im);
-        }
-
-        return Double.isInfinite(im) && !Double.isNaN(re);
-    }
 
     /**
      * Returns the real component of this complex number, commonly referred to as {@code Re(z)}.
      */
-    public double re() {
-        return re;
-    }
-
-    /**
-     * Returns this complex number with its real component replaced by the given value.
-     * The imaginary component is copied from this complex number without modification.
-     */
-    public Complex re(double x) {
-        return new Complex(x, im);
+    @Override
+    public double x() {
+        return x;
     }
 
     /**
      * Returns the imaginary component of this complex number, commonly referred to as {@code Im(z)}.
      */
-    public double im() {
-        return im;
+    @Override
+    public double y() {
+        return y;
     }
 
     /**
      * Returns this complex number with its imaginary component replaced by the given value.
      * The real component is copied from this complex number without modification.
      */
-    public Complex im(double y) {
-        return new Complex(re, y);
+    @Override
+    public Complex z(double x, double y) {
+        return new Complex(x, y);
     }
 
     /**
@@ -148,20 +108,9 @@ public class Complex implements BinaryNumber<Complex> {
      * <li>Otherwise, the result is the square root of the sum of the squares of the two components.</li>
      * </ul>
      */
+    @Override
     public double abs() {
-        return rhypot(re, im);
-    }
-
-    /**
-     * Returns the square of this complex number's absolute value, {@code |z|^2}.
-     * This is specified in the same terms as {@link #abs()}, except no square root is taken in the last case.
-     */
-    public double abs2() {
-        // Need to explicitly check for either component being infinite to ensure that they override NaN as specified.
-        if (Double.isInfinite(re) || Double.isInfinite(im)) {
-            return Double.POSITIVE_INFINITY;
-        }
-        return re * re + im * im;
+        return rhypot(x, y);
     }
 
     /**
@@ -170,135 +119,74 @@ public class Complex implements BinaryNumber<Complex> {
      * All behaviours regarding sign, infinities, and NaN values are given in its documentation.
      * This function has a branch cut along the negative real axis.
      */
+    @Override
     public double arg() {
-        return atan2(im, re);
-    }
-
-    /**
-     * Returns the negative value of this complex number, {@code -z}.
-     * For complex number {@code (a + bi)}, this yields {@code (-a - bi)}.
-     */
-    public Complex negative() {
-        return new Complex(-re, -im);
-    }
-
-    /**
-     * Returns the complex conjugate of this complex number, which is its reflection across the real axis.
-     * For complex number {@code (a + bi)}, this yields {@code (a - bi)}.
-     */
-    public Complex conjugate() {
-        return new Complex(re, -im);
-    }
-
-    /**
-     * Returns this complex number rectified into the first quadrant by taking the absolute value of its
-     * real and imaginary parts independently.
-     *
-     * @return <code>|re| + |im|</code><em>i</em>
-     */
-    public Complex rectify() {
-        return new Complex(rabs(re), rabs(im));
+        return atan2(y, x);
     }
 
     /**
      * Returns the multiplicative inverse ("reciprocal") of this complex number, {@code 1/z}.
      */
+    @Override
     public Complex inverse() {
-        double re2 = re * re;
-        double im2 = im * im;
+        double re2 = x * x;
+        double im2 = y * y;
         // Prevent real numbers from using -0.0 as the imaginary portion of the inverse, but
         // if both parts were +/-0, then make sure that they both end up NaN.
         if (im2 == 0.0) {
-            return re2 == 0.0 ? NaN : real(1.0 / re);
+            return re2 == 0.0 ? NaN : real(1.0 / x);
         } else if (re2 == 0.0) {
-            return imaginary(-1.0 / im);
+            return imaginary(-1.0 / y);
         } else {
             // 1 / (a + bi)   [ multiply both top and bottom by the complex conjugate, (a - bi) ]
             // (a - bi) / (a^2 + b^2)
             double scale = re2 + im2;
-            return new Complex(re / scale, -im / scale);
+            return new Complex(x / scale, -y / scale);
         }
     }
 
 
     //================================================================
-    // Arithmetic 
+    // Other simple properties
     //----------------------------------------------------------------
 
     /**
-     * Return the result of adding the real value {@code x} to this complex number.
+     * Returns the square of this complex number's absolute value, {@code |z|^2}.
+     * This is specified in the same terms as {@link #abs()}, except no square root is taken in the last case.
      */
-    public Complex plus(double x) {
-        return new Complex(re + x, im);
+    public double abs2() {
+        // Need to explicitly check for either component being infinite to ensure that they override NaN as specified.
+        if (Double.isInfinite(x) || Double.isInfinite(y)) {
+            return Double.POSITIVE_INFINITY;
+        }
+        return x * x + y * y;
+    }
+
+
+    //================================================================
+    // Multiplication and Division
+    //----------------------------------------------------------------
+
+    @Override
+    public Complex timesY() {
+        //noinspection SuspiciousNameCombination
+        return new Complex(-y, x);
+    }
+
+    @Override
+    public Complex timesY(double y) {
+        return new Complex(-this.y * y, x * y);
+    }
+
+    @Override
+    public Complex timesNegativeY() {
+        //noinspection SuspiciousNameCombination
+        return new Complex(y, -x);
     }
 
     /**
-     * Returns the result of adding the imaginary value {@code y*i} to this complex number.
-     */
-    public Complex plusI(double y) {
-        return new Complex(re, im + y);
-    }
-
-    /**
-     * Returns the result of adding the complex value {@code c} to this complex number.
-     */
-    public Complex plus(Complex c) {
-        return new Complex(re + c.re, im + c.im);
-    }
-
-    /**
-     * Return the result of subtracting the real value {@code x} from this complex number.
-     */
-    public Complex minus(double x) {
-        return new Complex(re - x, im);
-    }
-
-    /**
-     * Return the result of subtracting the imaginary value {@code y*i} from this complex number.
-     */
-    public Complex minusI(double y) {
-        return new Complex(re, im - y);
-    }
-
-    /**
-     * Return the result of subtracting the complex value {@code c} from this complex number.
-     */
-    public Complex minus(Complex c) {
-        return new Complex(re - c.re, im - c.im);
-    }
-
-    /**
-     * Returns the result of multiplying this complex value by the real value {@code x}.
-     */
-    public Complex times(double x) {
-        return new Complex(re * x, im * x);
-    }
-
-    /**
-     * Returns the result of multiplying this complex value by the imaginary value {@code i}.
-     * This convenience method will generally be more efficient than using the more general methods
-     * {@link #timesI(double) timesI(1)} or {@link #times(Complex) times}({@link #I}).
-     */
-    public Complex timesI() {
-        return new Complex(-im, re);
-    }
-
-    /**
-     * Returns the result of multiplying this complex value by the imaginary value {@code y*i}.
-     */
-    public Complex timesI(double y) {
-        return new Complex(-im * y, re * y);
-    }
-
-    /**
-     * Returns the result of multiplying this complex value by the imaginary value {@code -i}.
-     */
-    public Complex timesNegativeI() {
-        return new Complex(im, -re);
-    }
-
-    /**
-     * Returns the result of multiplying this complex value by the complex value {@code c}.
+     * {@inheritDoc}
+     *
      * This method uses the well-known and straight-forward approach of First Outside Inside Last distribution
      * of terms, then simplifying:
      * <ul>
@@ -308,18 +196,25 @@ public class Complex implements BinaryNumber<Complex> {
      * <li>(ac - bd) + i(ad + bc)</li>
      * </ul>
      */
-    public Complex times(Complex c) {
+    @Override
+    public Complex times(BinaryNumber<? extends Complex> c) {
+        if (c.y() == 0) {
+            return times(c.x());
+        }
+        if (y == 0) {
+            return c.times(x);
+        }
         return times(this, c);
     }
 
     // The logic and rules applied here are taken loosely from the example in Annex G of the C11 standard
     // ("IEC 60559-compatible complex arithmetic"), but tweaked for Java's slightly different rules around
     // infinities and NaN values.
-    private static Complex times(Complex z, Complex w) {
-        double a = z.re;
-        double b = z.im;
-        double c = w.re;
-        double d = w.im;
+    private static Complex times(Complex z, BinaryNumber<? extends Complex> w) {
+        double a = z.x;
+        double b = z.y;
+        double c = w.x();
+        double d = w.y();
         double ac = a * c;
         double ad = a * d;
         double bc = b * c;
@@ -381,29 +276,30 @@ public class Complex implements BinaryNumber<Complex> {
     }
 
 
-    /**
-     * Returns the result of dividing this complex value by the real value {@code x}.
-     */
-    public Complex div(double x) {
-        return new Complex(re / x, im / x);
-    }
 
     /**
      * Returns the result of dividing this complex value by the imaginary value {@code i}.
      * Note that diving by {@code i} is mathematically exactly equivalent to
-     * {@link #timesNegativeI() multiplying by -i}.
+     * {@link #timesNegativeY() multiplying by -i}.
      */
-    public Complex divI() {
-        return timesNegativeI();
+    @Override
+    public Complex divY() {
+        return timesNegativeY();
+    }
+
+    @Override
+    public Complex divY(double y) {
+        return z(this.y / y, -x / y);
     }
 
     /**
      * Returns the result of dividing this complex value by the imaginary value {@code i}.
      * Note that diving by {@code -i} is mathematically exactly equivalent to
-     * {@link #timesI() multiplying by i}.
+     * {@link #timesY() multiplying by i}.
      */
-    public Complex divNegativeI() {
-        return timesI();
+    @Override
+    public Complex divNegativeY() {
+        return timesY();
     }
 
     /**
@@ -432,31 +328,32 @@ public class Complex implements BinaryNumber<Complex> {
      * Dividing everything through by the larger term first minimizes the risk of overflow or loss of precision.
      * </p>
      */
-    public Complex div(Complex c) {
+    @Override
+    public Complex div(BinaryNumber<? extends Complex> c) {
         return div(this, c);
     }
 
-    private static Complex div(Complex z, Complex w) {
-        double absIm = rabs(w.im);
+    private static Complex div(Complex z, BinaryNumber<? extends Complex> w) {
+        double absIm = rabs(w.y());
         if (absIm == 0.0) {
-            return z.div(w.re);
+            return z.div(w.x());
         }
 
-        double a = z.re;
-        double b = z.im;
-        double c = w.re;
-        double d = w.im;
+        double a = z.x;
+        double b = z.y;
+        double c = w.x();
+        double d = w.y();
 
         double x, y, u, denom;
-        double absRe = rabs(w.re);
+        double absRe = rabs(c);
         if (absRe < absIm) {
-            u = w.re / w.im;
-            denom = w.re * u + w.im;
+            u = c / d;
+            denom = c * u + d;
             x = (a * u + b) / denom;
             y = (b * u - a) / denom;
         } else {
-            u = w.im / w.re;
-            denom = w.re + w.im * u;
+            u = d / c;
+            denom = c + d * u;
             x = (a + b * u) / denom;
             y = (b - a * u) / denom;
         }
@@ -489,7 +386,7 @@ public class Complex implements BinaryNumber<Complex> {
     //----------------------------------------------------------------
 
     // The naive approach is to return
-    //     rlog(sqrt(re * re + im + im))
+    //     rlog(sqrt(x * x + y + y))
     // but this risks an excessive loss of precision for small values.  To prevent this, we rewrite the expression
     // with a substitution of variables.  First, as signs and which component is which do not matter, let's assume
     // that neither value is 0 and name their absolute values a and b, without worrying just yet about which is which.
@@ -509,17 +406,18 @@ public class Complex implements BinaryNumber<Complex> {
     /**
      * Returns the natural logarithm of this complex number's {@link #abs() absolute value}, {@code log |z|}.
      */
+    @Override
     public double logabs() {
-        if (im == 0.0) {
-            return rlog(rabs(re));
+        if (y == 0.0) {
+            return rlog(rabs(x));
         }
 
-        double absIm = rabs(im);
-        if (re == 0.0) {
+        double absIm = rabs(y);
+        if (x == 0.0) {
             return rlog(absIm);
         }
 
-        double absRe = rabs(re);
+        double absRe = rabs(x);
         if (absRe > absIm) {
             double u = absIm / absRe;
             return rlog(absRe) + 0.5 * rlog1p(u * u);
@@ -530,28 +428,13 @@ public class Complex implements BinaryNumber<Complex> {
     }
 
     /**
-     * Returns the natural logarithm of this complex number, {@code log z}.
+     * {@inheritDoc}
+     *
      * All of the logarithmic functions provided here have a branch cut along the negative real axis.
      */
+    @Override
     public Complex log() {
         return new Complex(logabs(), arg());
-    }
-
-    /**
-     * Returns the logarithm of this complex number in the given {@code base}.
-     * All of the logarithmic functions provided here have a branch cut along the negative real axis.
-     */
-    public Complex logN(double base) {
-        final double lnBase = 1.0 / rlog(base);
-        return new Complex(re * lnBase, im * lnBase);
-    }
-
-    /**
-     * Returns the logarithm of this complex number in the given {@code base}.
-     * All of the logarithmic functions provided here have a branch cut along the negative real axis.
-     */
-    public Complex logN(Complex base) {
-        return log().div(base.log());
     }
 
     /**
@@ -580,41 +463,28 @@ public class Complex implements BinaryNumber<Complex> {
     /**
      * Returns the natural exponential of this complex number, {@code e^z}.
      */
+    @Override
     public Complex exp() {
-        return polar(rexp(re), im);
+        return polar(rexp(x), y);
     }
 
     /**
      * Returns the base 2 exponential of this complex number, {@code 2^z}.
      */
     public Complex exp2() {
-        double r = rexp(LN_2 * re);
-        double theta = LN_2 * im;
+        double r = rexp(LN_2 * x);
+        double theta = LN_2 * y;
         return polar(r, theta);
     }
 
-    /**
-     * Shorthand form of {@code z.times(z)} or {@code z.pow(2)}.
-     *
-     * @return {@code z^2}
-     */
-    public Complex pow2() {
-        return times(this);
-    }
+
 
     /**
-     * Shorthand form of {@code z.times(z).times(z)} or {@code z.pow(3)}.
+     * {@inheritDoc}
      *
-     * @return {@code z^3}
-     */
-    public Complex pow3() {
-        return times(this).times(this);
-    }
-
-    /**
-     * Returns the result of raising this complex number to the given power, {@code z^x}.
      * This function has a branch cut for {@code z} (this complex number) along the negative real axis.
      */
+    @Override
     public Complex pow(double x) {
         if (x == 0.0) {
             return ONE;
@@ -625,7 +495,7 @@ public class Complex implements BinaryNumber<Complex> {
         if (x == -1.0) {
             return inverse();
         }
-        if (re == 0.0 && im == 0.0) {
+        if (this.x == 0.0 && y == 0.0) {
             return ZERO;
         }
 
@@ -637,19 +507,20 @@ public class Complex implements BinaryNumber<Complex> {
     /**
      * Returns the result of raising this complex number to the given power, {@code z^c}.
      */
-    public Complex pow(Complex c) {
-        if (c.im == 0.0) {
-            return pow(c.re);
+    @Override
+    public Complex pow(BinaryNumber<? extends Complex> c) {
+        if (c.y() == 0.0) {
+            return pow(c.x());
         }
-        if (re == 0.0 && im == 0.0) {
+        if (x == 0.0 && y == 0.0) {
             return ZERO;
         }
 
         double logr = logabs();
         double theta = arg();
 
-        double rho = rexp(logr * c.re - c.im * theta);
-        double beta = theta * c.re + c.im * logr;
+        double rho = rexp(logr * c.x() - c.y() * theta);
+        double beta = theta * c.x() + c.y() * logr;
         return polar(rho, beta);
     }
 
@@ -739,22 +610,23 @@ public class Complex implements BinaryNumber<Complex> {
      * <li>Otherwise:  c = |b|/2t, d = sgn(b) * t</li>
      * </ul>
      */
+    @Override
     public Complex sqrt() {
-        double y = rabs(im);
+        double y = rabs(this.y);
         if (y == 0.0) {
-            return sqrt(re);
+            return sqrt(x);
         }
 
-        double x = rabs(re);
+        double x = rabs(this.x);
         if (x == 0.0) {
             return ZERO;
         }
 
         double t = rsqrt((x + rhypot(x, y)) / 2);
-        if (re >= 0.0) {
-            return new Complex(t, im / (2 * t));
+        if (this.x >= 0.0) {
+            return new Complex(t, this.y / (2 * t));
         }
-        return new Complex(y / (2 * t), copySign(t, im));
+        return new Complex(y / (2 * t), copySign(t, this.y));
     }
 
 
@@ -765,64 +637,43 @@ public class Complex implements BinaryNumber<Complex> {
     /**
      * Returns the sine of this complex value.
      */
+    @Override
     public Complex sin() {
         // Handle this special case to make sure we don't end up with -0.0i when dealing with real numbers.
-        if (im == 0.0) {
-            return real(rsin(re));
+        if (y == 0.0) {
+            return real(rsin(x));
         }
-        return new Complex(rsin(re) * rcosh(im), rcos(re) * rsinh(im));
+        return new Complex(rsin(x) * rcosh(y), rcos(x) * rsinh(y));
     }
 
     /**
      * Returns the cosine of this complex value.
      */
+    @Override
     public Complex cos() {
         // Handle this special case to make sure we don't end up with -0.0i when dealing with real numbers.
-        if (im == 0.0) {
-            return real(rcos(re));
+        if (y == 0.0) {
+            return real(rcos(x));
         }
-        return new Complex(rcos(re) * rcosh(im), rsin(re) * rsinh(-im));
+        return new Complex(rcos(x) * rcosh(y), rsin(x) * rsinh(-y));
     }
 
     /**
      * Returns the tangent of this complex value.
      */
+    @Override
     public Complex tan() {
-        double cosRe = rcos(re);
-        double sinhIm = rsinh(im);
+        double cosRe = rcos(x);
+        double sinhIm = rsinh(y);
         double scale = cosRe * cosRe + sinhIm * sinhIm;
 
-        if (rabs(im) < 1) {
-            return new Complex(0.5 * rsin(2.0 * re) / scale, 0.5 * rsinh(2.0 * im) / scale);
+        if (rabs(y) < 1) {
+            return new Complex(0.5 * rsin(2.0 * x) / scale, 0.5 * rsinh(2.0 * y) / scale);
         }
 
         double f = cosRe / sinhIm;
         f = 1 + f * f;
-        return new Complex(0.5 * rsin(2.0 * re) / scale, 1.0 / (rtanh(im) * f));
-    }
-
-    /**
-     * Returns the tangent of this complex value.
-     * This convenience method is equivalent to {@link #tan()}.{@link #inverse()}.
-     */
-    public Complex cot() {
-        return tan().inverse();
-    }
-
-    /**
-     * Returns the secant of this complex value.
-     * This convenience method is equivalent to {@link #cos()}.{@link #inverse()}.
-     */
-    public Complex sec() {
-        return cos().inverse();
-    }
-
-    /**
-     * Returns the cosecant of this complex value.
-     * This convenience method is equivalent to {@link #sin()}.{@link #inverse()}.
-     */
-    public Complex csc() {
-        return sin().inverse();
+        return new Complex(0.5 * rsin(2.0 * x) / scale, 1.0 / (rtanh(y) * f));
     }
 
 
@@ -857,12 +708,12 @@ public class Complex implements BinaryNumber<Complex> {
      * Arccosine Functions Using Exception Handling. Comm. ACM 23, 3</cite>.
      */
     public Complex asin() {
-        double y = rabs(im);
+        double y = rabs(this.y);
         if (y == 0.0) {
-            return asin(re);
+            return asin(x);
         }
 
-        double x = rabs(re);
+        double x = rabs(this.x);
         double r = rhypot(x + 1.0, y);
         double s = rhypot(x - 1.0, y);
         double a = 0.5 * (r + s);
@@ -894,7 +745,7 @@ public class Complex implements BinaryNumber<Complex> {
             zIm = rlog(a + rsqrt(a * a - 1.0));
         }
 
-        return new Complex(copySign(zRe, re), copySign(zIm, im));
+        return new Complex(copySign(zRe, this.x), copySign(zIm, this.y));
     }
 
     /**
@@ -920,12 +771,12 @@ public class Complex implements BinaryNumber<Complex> {
      * This function has a branch cut on the real axis outside the interval {@code [-1, 1]}.
      */
     public Complex acos() {
-        if (im == 0) {
-            return acos(re);
+        if (y == 0) {
+            return acos(x);
         }
 
-        double x = rabs(re);
-        double y = rabs(im);
+        double x = rabs(this.x);
+        double y = rabs(this.y);
         double r = rhypot(x + 1.0, y);
         double s = rhypot(x - 1.0, y);
         double a = 0.5 * (r + s);
@@ -965,12 +816,12 @@ public class Complex implements BinaryNumber<Complex> {
      * This function has a branch cut on the imaginary axis outside the interval {@code [-i, i]}.
      */
     public Complex atan() {
-        if (im == 0.0) {
-            return real(ratan(re));
+        if (y == 0.0) {
+            return real(ratan(x));
         }
 
-        Complex iMinusZ = complex(-re, -im + 1);
-        Complex iPlusZ = complex(re, im + 1);
+        Complex iMinusZ = complex(-x, -y + 1);
+        Complex iPlusZ = complex(x, y + 1);
         return iMinusZ.div(iPlusZ).log().times(ONE_OVER_2_I);
     }
 
@@ -1007,56 +858,43 @@ public class Complex implements BinaryNumber<Complex> {
      * Returns the hyperbolic sine of this complex number.
      */
     public Complex sinh() {
-        return new Complex(rsinh(re) * rcos(im), rcosh(re) * rsin(im));
+        return new Complex(rsinh(x) * rcos(y), rcosh(x) * rsin(y));
     }
 
     /**
      * Returns the hyperbolic cosine of this complex number.
      */
     public Complex cosh() {
-        return new Complex(rcosh(re) * rcos(im), rsinh(re) * rsin(im));
+        return new Complex(rcosh(x) * rcos(y), rsinh(x) * rsin(y));
     }
 
     /**
      * Returns the hyperbolic tangent of this complex number.
      */
     public Complex tanh() {
-        double cosIm = rcos(im);
-        double sinhRe = rsinh(re);
+        double cosIm = rcos(y);
+        double sinhRe = rsinh(x);
         double scale = cosIm * cosIm + sinhRe * sinhRe;
 
-        if (rabs(re) < 1.0) {
-            return new Complex(sinhRe * rcosh(re) / scale, 0.5 * rsin(2.0 * im) / scale);
+        if (rabs(x) < 1.0) {
+            return new Complex(sinhRe * rcosh(x) / scale, 0.5 * rsin(2.0 * y) / scale);
         }
 
         double f = cosIm / sinhRe;
         f = 1.0 + f * f;
-        return new Complex(1 / (rtanh(re) * f), 0.5 * rsin(2.0 * im) / scale);
+        return new Complex(1 / (rtanh(x) * f), 0.5 * rsin(2.0 * y) / scale);
     }
 
     /**
-     * Returns the inverse hyperbolic cotangent of this complex number.
-     * This convenience method is equivalent to <code>{@link #tanh()}.{@link #inverse()}</code>.
+     * {@inheritDoc}
+     * <p>
+     * This implementation uses {@link #tanh()} and {@link #inverse()} instead, because its {@link #tanh()}
+     * implementation has better precision.
      */
     public Complex coth() {
         return tanh().inverse();
     }
 
-    /**
-     * Returns the inverse hyperbolic secant of this complex number.
-     * This convenience method is equivalent to <code>{@link #cosh()}.{@link #inverse()}</code>.
-     */
-    public Complex sech() {
-        return cosh().inverse();
-    }
-
-    /**
-     * Returns the inverse hyperbolic cosecant of this complex number.
-     * This convenience method is equivalent to <code>{@link #sinh()}.{@link #inverse()}</code>.
-     */
-    public Complex csch() {
-        return sinh().inverse();
-    }
 
 
     //================================================================
@@ -1072,7 +910,7 @@ public class Complex implements BinaryNumber<Complex> {
      * This function has a branch cut on the imaginary axis outside the range {@code [-i, i]}.
      */
     public Complex asinh() {
-        return timesI().asin().timesNegativeI();
+        return timesY().asin().timesNegativeY();
     }
 
     /**
@@ -1080,11 +918,11 @@ public class Complex implements BinaryNumber<Complex> {
      * This function has a branch cut for values less than 1 on the real axis.
      */
     public Complex acosh() {
-        if (im == 0) {
-            return acosh(re);
+        if (y == 0) {
+            return acosh(x);
         }
         Complex z = acos();
-        return (z.im > 0) ? z.timesNegativeI() : z.timesI();
+        return (z.y > 0) ? z.timesNegativeY() : z.timesY();
     }
 
     /**
@@ -1107,7 +945,7 @@ public class Complex implements BinaryNumber<Complex> {
      * This function has a branch cut on the real axis outside the range {@code [-1, 1]}.
      */
     public Complex atanh() {
-        return timesI().atan().timesNegativeI();
+        return timesY().atan().timesNegativeY();
     }
 
     /**
@@ -1156,10 +994,10 @@ public class Complex implements BinaryNumber<Complex> {
      * </ol>
      */
     public Complex proj() {
-        if (Double.isInfinite(re) || Double.isInfinite(im)) {
+        if (Double.isInfinite(x) || Double.isInfinite(y)) {
             return POSITIVE_RE_INFINITY;
         }
-        if (re == 0.0 && im == 0.0) {
+        if (x == 0.0 && y == 0.0) {
             return ZERO;
         }
         return this;
@@ -1173,23 +1011,23 @@ public class Complex implements BinaryNumber<Complex> {
      * <ol>
      * <li>If either the real or imaginary component is infinite, then the result is a new complex number with
      * positive infinity as its real component and either positive or negative {@code 0} as its imaginary
-     * component, preserving the existing sign from {@link #im()}.</li>
+     * component, preserving the existing sign from {@link #y()}.</li>
      * <li>Otherwise, this complex number is returned unmodified</li>
      * </ol>
      */
     public Complex cproj() {
-        if (Double.isInfinite(re) || Double.isInfinite(im)) {
-            return new Complex(Double.POSITIVE_INFINITY, copySign(0.0, im));
+        if (Double.isInfinite(x) || Double.isInfinite(y)) {
+            return new Complex(Double.POSITIVE_INFINITY, copySign(0.0, y));
         }
         return this;
     }
 
     /**
-     * Factory method that promotes a simple real number to a complex number with real component {@code re} and
+     * Factory method that promotes a simple real number to a complex number with real component {@code x} and
      * imaginary component {@code 0}.
      *
      * @param re the real component of the complex number
-     * @return {@code re} as a complex number
+     * @return {@code x} as a complex number
      */
     public static Complex real(double re) {
         return new Complex(re, 0.0);
@@ -1197,10 +1035,10 @@ public class Complex implements BinaryNumber<Complex> {
 
     /**
      * Factory method that promotes a simple real number to a complex number with real component {@code 0} and
-     * imaginary component {@code im}.
+     * imaginary component {@code y}.
      *
      * @param im the imaginary component of the complex number
-     * @return {@code im * i} as a complex number
+     * @return {@code y * i} as a complex number
      */
     public static Complex imaginary(double im) {
         return new Complex(0.0, im);
@@ -1240,12 +1078,12 @@ public class Complex implements BinaryNumber<Complex> {
      * @see SplitComplex#asComplex()
      */
     public SplitComplex asSplitComplex() {
-        return SplitComplex.splitComplex(re, im);
+        return SplitComplex.splitComplex(x, y);
     }
 
     // compute erfcx(z) = exp(z^2) erfz(z)
     private static Complex erfcx(Complex z, double relerr) {
-        return w(z.timesI(), relerr);
+        return w(z.timesY(), relerr);
     }
 
     private static Complex w(Complex z, double relerr) {
@@ -1254,13 +1092,13 @@ public class Complex implements BinaryNumber<Complex> {
 
     @Override
     public String toString() {
-        if (Double.isNaN(im)) {
-            return "(" + re + ' ' + im + "i)";
+        if (Double.isNaN(y)) {
+            return "(" + x + ' ' + y + "i)";
         }
-        if (im < 0) {
-            return "(" + re + im + "i)";
+        if (y < 0) {
+            return "(" + x + y + "i)";
         }
-        return "(" + re + '+' + im + "i)";
+        return "(" + x + '+' + y + "i)";
     }
 
     public static void main(String[] args) {

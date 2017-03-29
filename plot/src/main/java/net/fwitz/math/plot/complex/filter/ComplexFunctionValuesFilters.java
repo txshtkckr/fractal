@@ -17,8 +17,8 @@ public class ComplexFunctionValuesFilters extends ValuesFilters<Complex> {
 
     private ComplexFunctionValuesFilters() {
         super(
-                new ValuesFilter<>("Real only", mapEachValue(z -> real(z.re()))),
-                new ValuesFilter<>("Imaginary only", mapEachValue(z -> imaginary(z.im()))),
+                new ValuesFilter<>("Real only", mapEachValue(z -> real(z.x()))),
+                new ValuesFilter<>("Imaginary only", mapEachValue(z -> imaginary(z.y()))),
                 new ValuesFilter<>("dz/dx", dz()),
                 new ValuesFilter<>("d2z/dx2", d2z())
         );

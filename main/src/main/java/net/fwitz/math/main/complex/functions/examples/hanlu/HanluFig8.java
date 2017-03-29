@@ -22,6 +22,6 @@ public class HanluFig8 {
     private static Complex fn(Complex z) {
         return z.plus(2).pow(2)
                 .times(z.minus(ONE_PLUS_2_I))
-                .times(z.plusI(1));
+                .times(z.plusY(1));
     }
 }

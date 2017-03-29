@@ -186,11 +186,11 @@ public class ErfTest {
                 Complex zi = z[i];
                 Complex wi = w[i];
                 Complex fw = Erf.w(zi, 0);
-                double errRe = relerr(wi.re(), fw.re());
-                double errIm = relerr(wi.im(), fw.im());
+                double errRe = relerr(wi.x(), fw.x());
+                double errIm = relerr(wi.y(), fw.y());
                 PrintStream ps = (errRe > MAX_ERR || errIm > MAX_ERR) ? System.err : System.out;
-                ps.printf("w(%g %+gi) = %g %+gi (vs. %g %+gi), re/im rel. err. = %.2g/%.2g)\n",
-                        zi.re(), zi.im(), fw.re(), fw.im(), wi.re(), wi.im(),
+                ps.printf("w(%g %+gi) = %g %+gi (vs. %g %+gi), x/y rel. err. = %.2g/%.2g)\n",
+                        zi.x(), zi.y(), fw.x(), fw.y(), wi.x(), wi.y(),
                         errRe, errIm);
                 if (errRe > errMax) {
                     errMax = errRe;
@@ -516,11 +516,11 @@ public class ErfTest {
             Complex zi = z[i];
             Complex wi = w[i];
             Complex fw = complexFn.apply(zi, 0.0);
-            double errRe = relerr(wi.re(), fw.re());
-            double errIm = relerr(wi.im(), fw.im());
+            double errRe = relerr(wi.x(), fw.x());
+            double errIm = relerr(wi.y(), fw.y());
             PrintStream ps = (errRe > MAX_ERR || errIm > MAX_ERR) ? System.err : System.out;
-            ps.printf("%s(%g %+gi) = %g %+gi (vs. %g %+gi), re/im rel. err. = %.2g/%.2g)\n",
-                    name, zi.re(), zi.im(), fw.re(), fw.im(), wi.re(), wi.im(),
+            ps.printf("%s(%g %+gi) = %g %+gi (vs. %g %+gi), x/y rel. err. = %.2g/%.2g)\n",
+                    name, zi.x(), zi.y(), fw.x(), fw.y(), wi.x(), wi.y(),
                     errRe, errIm);
             if (errRe > errMax) {
                 errMax = errRe;
@@ -538,25 +538,25 @@ public class ErfTest {
         System.out.println("Checking " + name + "(x) special case...\n");
         for (int i = 0; i < 10000; ++i) {
             double x = pow(10., -300. + i * 600. / (10000 - 1));
-            double errRe = relerr(realFn.apply(x), complexFn.apply(complex(x, x * relerr), 0.).re());
+            double errRe = relerr(realFn.apply(x), complexFn.apply(complex(x, x * relerr), 0.).x());
             if (errRe > errMax) {
                 errMax = errRe;
             }
-            errRe = relerr(realFn.apply(-x), complexFn.apply(complex(-x, x * relerr), 0.).re());
+            errRe = relerr(realFn.apply(-x), complexFn.apply(complex(-x, x * relerr), 0.).x());
             if (errRe > errMax) {
                 errMax = errRe;
             }
         }
         {
-            double errRe = relerr(realFn.apply(POSITIVE_INFINITY), complexFn.apply(complex(POSITIVE_INFINITY, 0), 0.0).re());
+            double errRe = relerr(realFn.apply(POSITIVE_INFINITY), complexFn.apply(complex(POSITIVE_INFINITY, 0), 0.0).x());
             if (errRe > errMax) {
                 errMax = errRe;
             }
-            errRe = relerr(realFn.apply(NEGATIVE_INFINITY), complexFn.apply(complex(NEGATIVE_INFINITY, 0), 0.0).re());
+            errRe = relerr(realFn.apply(NEGATIVE_INFINITY), complexFn.apply(complex(NEGATIVE_INFINITY, 0), 0.0).x());
             if (errRe > errMax) {
                 errMax = errRe;
             }
-            errRe = relerr(realFn.apply(NaN), complexFn.apply(complex(NaN, 0), 0.0).re());
+            errRe = relerr(realFn.apply(NaN), complexFn.apply(complex(NaN, 0), 0.0).x());
             if (errRe > errMax) {
                 errMax = errRe;
             }

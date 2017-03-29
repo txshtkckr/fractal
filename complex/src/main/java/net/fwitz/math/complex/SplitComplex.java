@@ -1,6 +1,5 @@
 package net.fwitz.math.complex;
 
-import static java.lang.Double.doubleToLongBits;
 import static net.fwitz.math.complex.RealMath.rabs;
 import static net.fwitz.math.complex.RealMath.ratanh;
 import static net.fwitz.math.complex.RealMath.rcos;
@@ -13,14 +12,10 @@ import static net.fwitz.math.complex.RealMath.rsinh;
 import static net.fwitz.math.complex.RealMath.rtan;
 import static net.fwitz.math.complex.RealMath.rtanh;
 
-public class SplitComplex {
+public class SplitComplex extends BinaryNumber<SplitComplex> {
     private static final SplitComplex NaN = new SplitComplex(Double.NaN, Double.NaN);
     private static final SplitComplex ZERO = new SplitComplex(0, 0);
     private static final SplitComplex ONE = new SplitComplex(1, 0);
-    private static final SplitComplex UNIT_POS_1 = new SplitComplex(1, 0);
-    private static final SplitComplex UNIT_POS_J = new SplitComplex(0, 1);
-    private static final SplitComplex UNIT_NEG_1 = new SplitComplex(-1, 0);
-    private static final SplitComplex UNIT_NEG_J = new SplitComplex(0, -1);
 
     private final double x;
     private final double y;
@@ -34,116 +29,59 @@ public class SplitComplex {
         return new SplitComplex(x, y);
     }
 
-    public boolean isNaN() {
-        return Double.isNaN(x) || Double.isNaN(y);
-    }
-
-    public boolean isInfinite() {
-        if (Double.isInfinite(x)) {
-            return !Double.isNaN(y);
-        }
-
-        return Double.isInfinite(x) && !Double.isNaN(y);
+    @Override
+    protected SplitComplex z(double x, double y) {
+        return new SplitComplex(x, y);
     }
 
     @Override
-    public int hashCode() {
-        return Double.hashCode(x) * 31 + Double.hashCode(y) + 83;
-    }
-
-    public boolean equals(Object o) {
-        return o == this || (o instanceof SplitComplex && equalTo((SplitComplex) o));
-    }
-
-    private boolean equalTo(SplitComplex c) {
-        return doubleToLongBits(x) == doubleToLongBits(c.x) &&
-                doubleToLongBits(y) == doubleToLongBits(c.y);
-    }
-
     public double x() {
         return x;
     }
 
-    public SplitComplex x(double x) {
-        return new SplitComplex(x, y);
-    }
-
+    @Override
     public double y() {
         return y;
     }
 
-    public SplitComplex y(double y) {
-        return new SplitComplex(x, y);
-    }
-
-    public SplitComplex plus(double x) {
-        return new SplitComplex(this.x + x, y);
-    }
-
-    public SplitComplex plusJ(double y) {
-        return new SplitComplex(x, this.y + y);
-    }
-
-    public SplitComplex plus(SplitComplex c) {
-        return new SplitComplex(x + c.x, y + c.y);
-    }
-
-
-    public SplitComplex minus(double x) {
-        return new SplitComplex(this.x - x, y);
-    }
-
-    public SplitComplex minusJ(double y) {
-        return new SplitComplex(x, this.y - y);
-    }
-
-    public SplitComplex minus(SplitComplex c) {
-        return new SplitComplex(x - c.x, y - c.y);
-    }
-
-
-    public SplitComplex times(double x) {
-        return new SplitComplex(this.x * x, x * y);
-    }
-
-    public SplitComplex timesJ() {
+    @Override
+    public SplitComplex timesY() {
         //noinspection SuspiciousNameCombination
-        return new SplitComplex(y, x);
+        return z(y, x);
     }
 
-    public SplitComplex timesNegativeJ() {
-        return new SplitComplex(-y, -x);
+    @Override
+    public SplitComplex timesY(double y) {
+        //noinspection SuspiciousNameCombination
+        return z(this.y * y, x * y);
     }
 
-    public SplitComplex timesJ(double y) {
-        return new SplitComplex(this.y * y, x * y);
+    @Override
+    public SplitComplex timesNegativeY() {
+        return z(-y, -x);
     }
 
-    public SplitComplex times(SplitComplex c) {
-        return new SplitComplex(x * c.x + y * c.y, x * c.y + y * c.x);
+    @Override
+    public SplitComplex times(BinaryNumber<? extends SplitComplex> c) {
+        return new SplitComplex(x * c.x() + y * c.y(), x * c.y() + y * c.x());
     }
 
-    public SplitComplex div(double x) {
-        return new SplitComplex(this.x / x, y / x);
+    @Override
+    public SplitComplex divY() {
+        return timesY();
     }
 
-    public SplitComplex divJ(double y) {
+    @Override
+    public SplitComplex divY(double y) {
         return new SplitComplex(this.y / y, x / y);
     }
 
-    public SplitComplex div(SplitComplex c) {
-        return times(c.inverse());
+    @Override
+    public SplitComplex divNegativeY() {
+        return timesNegativeY();
     }
 
-
-    public SplitComplex conjugate() {
-        return new SplitComplex(x, -y);
-    }
-
-    public SplitComplex negative() {
-        return new SplitComplex(-x, -y);
-    }
-
+    @Override
     public SplitComplex inverse() {
         double modulus = modulus2();
         if (modulus == 0) {
@@ -152,11 +90,9 @@ public class SplitComplex {
         return new SplitComplex(x / modulus, -y / modulus);
     }
 
-    public SplitComplex rectify() {
-        return new SplitComplex(Math.abs(x), Math.abs(y));
-    }
-
     /**
+     * {@inheritDoc}
+     * <p>
      * <strong>WARNING</strong>: See terminology note on {@link #modulus2()}!
      */
     public double abs() {
@@ -167,7 +103,7 @@ public class SplitComplex {
     //     log(sqrt(abs(x * x - y + y)))
     // but this risks an excessive loss of precision for small values.  To prevent this, we rewrite the expression
     // with a substitution of variables.  First, signs do not matter, but since we need to take a square root and
-    // and we're taking the different of two squares, we need to decide which one is smaller up front.  To keep the
+    // and we'x taking the different of two squares, we need to decide which one is smaller up front.  To keep the
     // structure of this as similar as possible to what we have in Complex.logabs(), let's make "a" smaller and
     // swap the terms inside the sqrt to take this into account so we can skip a call to abs().  We can then
     // restructure the expression as follows:
@@ -240,6 +176,7 @@ public class SplitComplex {
         return (x + y) * (x - y);
     }
 
+    @Override
     public SplitComplex exp() {
         // Ensure we don't end up with -0.0 for either part
         if (x == 0.0 && !Double.isNaN(y)) {
@@ -251,14 +188,7 @@ public class SplitComplex {
         return new SplitComplex(r * Math.cosh(y), y * Math.sinh(y));
     }
 
-    public SplitComplex pow2() {
-        return times(this);
-    }
-
-    public SplitComplex pow3() {
-        return times(this).times(this);
-    }
-
+    @Override
     public SplitComplex pow(double a) {
         if (a == 0.0) {
             return ONE;
@@ -278,18 +208,20 @@ public class SplitComplex {
         return polar(r, theta);
     }
 
-    public SplitComplex pow(SplitComplex c) {
-        if (c.y == 0) {
-            return pow(c.x);
+    @Override
+    public SplitComplex pow(BinaryNumber<? extends SplitComplex> c) {
+        if (c.y() == 0) {
+            return pow(c.x());
         }
         if (x == 0.0 && y == 0.0) {
             return ZERO;
         }
 
-        // PRobably possible to shortcut this, like Complex.pow(Complex) does?
+        // Probably possible to shortcut this, like Complex.pow(Complex) does?
         return log().times(c).exp();
     }
 
+    @Override
     public SplitComplex log() {
         return new SplitComplex(logabs(), arg());
     }
@@ -307,6 +239,7 @@ public class SplitComplex {
     //    sin(a + b) = sin(a) cos(b) + cos(a) sin(b)
     //    sin(x + jy) = sin(x) cos(jy) + cos(x) sin(jy)            [ substitute a = x, b = jy ]
     //    sin(x + jy) = sin(x) cos(y) + j cos(x) sin(y)            [ sin(jy) = j sin(y), cos(jy) = cos(y) ]
+    @Override
     public SplitComplex sin() {
         if (y == 0) {
             return splitComplex(rsin(x), 0);
@@ -321,6 +254,7 @@ public class SplitComplex {
     //    cos(a + b) = cos(a) cos(b) - sin(a) sin(b)
     //    cos(x + jy) = cos(x) cos(jy) - sin(x) sin(jy)            [ substitute a = x, b = jy ]
     //    cos(x + jy) = cos(x) cos(y) - j sin(x) sin(y)            [ sin(jy) = j sin(y), cos(jy) = cos(y) ]
+    @Override
     public SplitComplex cos() {
         if (y == 0) {
             return splitComplex(rcos(x), 0);
@@ -337,6 +271,7 @@ public class SplitComplex {
     //    tan(jy) = j sin(y) / cos(y)                              [ sin(jy) = j sin(y), cos(jy) = cos(y) ]
     //    tan(jy) = j tan(y)                                       [ def. of tangent ]
     // The double angle formula is messy, so not messing with it for now.
+    @Override
     public SplitComplex tan() {
         if (y == 0) {
             return splitComplex(rtan(x), 0);
@@ -355,6 +290,7 @@ public class SplitComplex {
         return numer.div(denom);
     }
 
+    @Override
     public SplitComplex cot() {
         if (y == 0) {
             return splitComplex(1 / rtan(x), 0);
@@ -373,13 +309,6 @@ public class SplitComplex {
         return numer.div(denom);
     }
 
-    public SplitComplex sec() {
-        return cos().inverse();
-    }
-
-    public SplitComplex csc() {
-        return sin().inverse();
-    }
 
     // For sinh, the arguments are similar to those for sin and cos.
     // For sinh, all of the powers of j are odd, so there is a single common j that can be factored out, giving:
@@ -390,6 +319,7 @@ public class SplitComplex {
     //    sinh(a + b) = sinh(a) cosh(b) + cosh(a) sinh(b)
     //    sinh(x + jy) = sinh(x) cosh(jy) + cosh(x) sinh(jy)   [ Substitute a = x, b = jy ]
     //    sinh(x + jy) = sinh(x) cosh(y) + j cosh(x) sinh(y)   [ sinh(jy) = j sinh(y), cosh(jy) = cosh(y) ]
+    @Override
     public SplitComplex sinh() {
         if (y == 0) {
             return splitComplex(rsinh(x), 0);
@@ -404,6 +334,7 @@ public class SplitComplex {
     //    cosh(a + b) = cosh(a) cosh(b) + sinh(a) sinh(b)
     //    cosh(x + jy) = cosh(x) cosh(jy) + sinh(x) sinh(jy)   [ Substitute a = x, b = jy ]
     //    cosh(x + jy) = cosh(x) cosh(y) + j sinh(x) sinh(y)   [ sinh(jy) = j sinh(y), cosh(jy) = cosh(y) ]
+    @Override
     public SplitComplex cosh() {
         if (y == 0) {
             return splitComplex(rcosh(x), 0);
@@ -416,6 +347,7 @@ public class SplitComplex {
 
     // Since you can factor j out of sinh and drop it from cosh, this implies that j can be factored out of tanh.
     // Not going beyond this for now, though.
+    @Override
     public SplitComplex tanh() {
         if (y == 0) {
             return splitComplex(rtanh(x), 0);
@@ -434,6 +366,7 @@ public class SplitComplex {
         return numer.div(denom);
     }
 
+    @Override
     public SplitComplex coth() {
         if (y == 0) {
             return splitComplex(1 / rtanh(x), 0);
@@ -452,14 +385,7 @@ public class SplitComplex {
         return numer.div(denom);
     }
 
-    public SplitComplex sech() {
-        return cosh().inverse();
-    }
-
-    public SplitComplex csch() {
-        return sinh().inverse();
-    }
-
+    @Override
     public double arg() {
         if (isNaN()) {
             return Double.NaN;

@@ -78,18 +78,18 @@ public class MandelbrotPlot {
 
     // Returns true if c is in the main cardioid or the largest circular bulb to avoid wasting iterations on them.
     // This is an optimization that greatly reduces the time to render the set when these portions of the set are
-    // included in the picture.  They're also
+    // included in the picture.  They'x also
     private static boolean inMainCardioidOrCircle(Complex c) {
-        double re = c.re();
+        double re = c.x();
         if (re <= -0.75) {
             // Check the main circle
             double q = re + 1;
-            q = q * q + c.im() * c.im();
+            q = q * q + c.y() * c.y();
             return q < 0.0625;
         }
 
         // Check the main cardioid
-        double im = c.im();
+        double im = c.y();
         double q = re - 0.25;
         q = q * q + im * im;
         q = q * (q + re - 0.25);

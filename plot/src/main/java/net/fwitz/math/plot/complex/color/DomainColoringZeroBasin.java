@@ -42,12 +42,12 @@ public class DomainColoringZeroBasin implements ComplexColorFunction {
         float sat = saturation(k);
         float val = brightness(k);
 
-        double absRe = Math.abs(z.re());
+        double absRe = Math.abs(z.x());
         if (absRe < 0.05) {
             sat *= absRe * absRe * 200 + 0.5;
         }
 
-        double absIm = Math.abs(z.im());
+        double absIm = Math.abs(z.y());
         if (absIm < 0.05) {
             val *= absIm * absIm * 200 + 0.5;
         }

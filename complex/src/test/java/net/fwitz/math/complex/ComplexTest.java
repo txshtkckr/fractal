@@ -91,64 +91,64 @@ public class ComplexTest {
 
     @Test
     public void re() {
-        assertThat(real(0).re(), p0());
-        assertThat(real(4).re(), apx(4));
-        assertThat(real(-4).re(), apx(-4));
-        assertThat(real(Double.NaN).re(), nan());
-        assertThat(real(Double.POSITIVE_INFINITY).re(), pinf());
-        assertThat(real(Double.NEGATIVE_INFINITY).re(), ninf());
+        assertThat(real(0).x(), p0());
+        assertThat(real(4).x(), apx(4));
+        assertThat(real(-4).x(), apx(-4));
+        assertThat(real(Double.NaN).x(), nan());
+        assertThat(real(Double.POSITIVE_INFINITY).x(), pinf());
+        assertThat(real(Double.NEGATIVE_INFINITY).x(), ninf());
 
-        assertThat(imaginary(0).re(), p0());
-        assertThat(imaginary(3).re(), p0());
-        assertThat(imaginary(-3).re(), p0());
-        assertThat(imaginary(Double.NaN).re(), p0());
-        assertThat(imaginary(Double.POSITIVE_INFINITY).re(), p0());
-        assertThat(imaginary(Double.NEGATIVE_INFINITY).re(), p0());
+        assertThat(imaginary(0).x(), p0());
+        assertThat(imaginary(3).x(), p0());
+        assertThat(imaginary(-3).x(), p0());
+        assertThat(imaginary(Double.NaN).x(), p0());
+        assertThat(imaginary(Double.POSITIVE_INFINITY).x(), p0());
+        assertThat(imaginary(Double.NEGATIVE_INFINITY).x(), p0());
 
-        assertThat(complex(4, 3).re(), apx(4));
-        assertThat(complex(-4, 3).re(), apx(-4));
-        assertThat(complex(4, -3).re(), apx(4));
-        assertThat(complex(-4, -3).re(), apx(-4));
-        assertThat(complex(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY).re(), pinf());
-        assertThat(complex(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY).re(), pinf());
-        assertThat(complex(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY).re(), ninf());
-        assertThat(complex(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY).re(), ninf());
-        assertThat(complex(Double.POSITIVE_INFINITY, Double.NaN).re(), pinf());
-        assertThat(complex(Double.NEGATIVE_INFINITY, Double.NaN).re(), ninf());
-        assertThat(complex(Double.NaN, Double.POSITIVE_INFINITY).re(), nan());
-        assertThat(complex(Double.NaN, Double.NEGATIVE_INFINITY).re(), nan());
-        assertThat(complex(Double.NaN, Double.NaN).re(), nan());
+        assertThat(complex(4, 3).x(), apx(4));
+        assertThat(complex(-4, 3).x(), apx(-4));
+        assertThat(complex(4, -3).x(), apx(4));
+        assertThat(complex(-4, -3).x(), apx(-4));
+        assertThat(complex(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY).x(), pinf());
+        assertThat(complex(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY).x(), pinf());
+        assertThat(complex(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY).x(), ninf());
+        assertThat(complex(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY).x(), ninf());
+        assertThat(complex(Double.POSITIVE_INFINITY, Double.NaN).x(), pinf());
+        assertThat(complex(Double.NEGATIVE_INFINITY, Double.NaN).x(), ninf());
+        assertThat(complex(Double.NaN, Double.POSITIVE_INFINITY).x(), nan());
+        assertThat(complex(Double.NaN, Double.NEGATIVE_INFINITY).x(), nan());
+        assertThat(complex(Double.NaN, Double.NaN).x(), nan());
     }
 
     @Test
     public void im() {
-        assertThat(real(0).im(), p0());
-        assertThat(real(4).im(), p0());
-        assertThat(real(-4).im(), p0());
-        assertThat(real(Double.NaN).im(), p0());
-        assertThat(real(Double.POSITIVE_INFINITY).im(), p0());
-        assertThat(real(Double.NEGATIVE_INFINITY).im(), p0());
+        assertThat(real(0).y(), p0());
+        assertThat(real(4).y(), p0());
+        assertThat(real(-4).y(), p0());
+        assertThat(real(Double.NaN).y(), p0());
+        assertThat(real(Double.POSITIVE_INFINITY).y(), p0());
+        assertThat(real(Double.NEGATIVE_INFINITY).y(), p0());
 
-        assertThat(imaginary(0).im(), p0());
-        assertThat(imaginary(3).im(), apx(3));
-        assertThat(imaginary(-3).im(), apx(-3));
-        assertThat(imaginary(Double.NaN).im(), nan());
-        assertThat(imaginary(Double.POSITIVE_INFINITY).im(), pinf());
-        assertThat(imaginary(Double.NEGATIVE_INFINITY).im(), ninf());
+        assertThat(imaginary(0).y(), p0());
+        assertThat(imaginary(3).y(), apx(3));
+        assertThat(imaginary(-3).y(), apx(-3));
+        assertThat(imaginary(Double.NaN).y(), nan());
+        assertThat(imaginary(Double.POSITIVE_INFINITY).y(), pinf());
+        assertThat(imaginary(Double.NEGATIVE_INFINITY).y(), ninf());
 
-        assertThat(complex(4, 3).im(), apx(3));
-        assertThat(complex(-4, 3).im(), apx(3));
-        assertThat(complex(4, -3).im(), apx(-3));
-        assertThat(complex(-4, -3).im(), apx(-3));
-        assertThat(complex(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY).im(), pinf());
-        assertThat(complex(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY).im(), ninf());
-        assertThat(complex(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY).im(), pinf());
-        assertThat(complex(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY).im(), ninf());
-        assertThat(complex(Double.POSITIVE_INFINITY, Double.NaN).im(), nan());
-        assertThat(complex(Double.NEGATIVE_INFINITY, Double.NaN).im(), nan());
-        assertThat(complex(Double.NaN, Double.POSITIVE_INFINITY).im(), pinf());
-        assertThat(complex(Double.NaN, Double.NEGATIVE_INFINITY).im(), ninf());
-        assertThat(complex(Double.NaN, Double.NaN).im(), nan());
+        assertThat(complex(4, 3).y(), apx(3));
+        assertThat(complex(-4, 3).y(), apx(3));
+        assertThat(complex(4, -3).y(), apx(-3));
+        assertThat(complex(-4, -3).y(), apx(-3));
+        assertThat(complex(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY).y(), pinf());
+        assertThat(complex(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY).y(), ninf());
+        assertThat(complex(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY).y(), pinf());
+        assertThat(complex(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY).y(), ninf());
+        assertThat(complex(Double.POSITIVE_INFINITY, Double.NaN).y(), nan());
+        assertThat(complex(Double.NEGATIVE_INFINITY, Double.NaN).y(), nan());
+        assertThat(complex(Double.NaN, Double.POSITIVE_INFINITY).y(), pinf());
+        assertThat(complex(Double.NaN, Double.NEGATIVE_INFINITY).y(), ninf());
+        assertThat(complex(Double.NaN, Double.NaN).y(), nan());
     }
 
     @Test
@@ -390,7 +390,7 @@ public class ComplexTest {
     }
 
     private static Matcher<Complex> cpx(Complex expectedValue) {
-        return new ComplexMatcher(apx(expectedValue.re()), apx(expectedValue.im()));
+        return new ComplexMatcher(apx(expectedValue.x()), apx(expectedValue.y()));
     }
 
 
@@ -489,14 +489,14 @@ public class ComplexTest {
 
         @Override
         protected boolean matchesSafely(Complex complex) {
-            return expectedRe.matches(complex.re()) && expectedIm.matches(complex.im());
+            return expectedRe.matches(complex.x()) && expectedIm.matches(complex.y());
         }
 
         @Override
         public void describeTo(Description description) {
-            description.appendText("Complex(re = ")
+            description.appendText("Complex(x = ")
                     .appendDescriptionOf(expectedRe)
-                    .appendText("; im = ")
+                    .appendText("; y = ")
                     .appendDescriptionOf(expectedIm)
                     .appendText(")");
         }

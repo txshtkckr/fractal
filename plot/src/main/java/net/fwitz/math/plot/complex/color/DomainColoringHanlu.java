@@ -28,7 +28,7 @@ public class DomainColoringHanlu implements ComplexColorFunction {
     }
 
     private static boolean isOnGrid(Complex z) {
-        return closeToInt(z.re(), DELTA) || closeToInt(z.im(), DELTA);
+        return closeToInt(z.x(), DELTA) || closeToInt(z.y(), DELTA);
     }
 
     public Color apply(Complex c, Complex z) {
