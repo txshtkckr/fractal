@@ -3,9 +3,9 @@ package net.fwitz.math.main.escape;
 import net.fwitz.math.complex.Complex;
 import net.fwitz.math.fractal.escape.EscapeFunction;
 import net.fwitz.math.fractal.escape.EscapeTimeResult;
-import net.fwitz.math.plot.complex.escape.color.EscapeTimePaletteFunction;
-import net.fwitz.math.plot.palette.PaletteVGA256;
-import net.fwitz.math.plot.complex.escape.EscapeTimePlot;
+import net.fwitz.math.plot.binary.escape.color.EscapeTimePaletteFunction;
+import net.fwitz.math.plot.renderer.palette.PaletteVGA256;
+import net.fwitz.math.plot.binary.escape.EscapeTimePlot;
 
 import java.util.function.Function;
 
@@ -23,10 +23,11 @@ public class BurningShipPlot {
             .build();
 
     public static void main(String[] args) {
-        new EscapeTimePlot("Burning Ship (Escape time)")
+        EscapeTimePlot.complex("Burning Ship (Escape time)")
                 .computeFn(BURNING_SHIP)
                 .colorFn(EscapeTimePaletteFunction.escapeTime(new PaletteVGA256()))
-                .domainBound(P_MIN, Q_MIN, P_MAX, Q_MAX)
+                .domainX(P_MIN, P_MAX)
+                .domainY(Q_MIN, Q_MAX)
                 .render();
     }
 }

@@ -2,8 +2,8 @@ package net.fwitz.math.main.escape.newton;
 
 import net.fwitz.math.complex.Complex;
 import net.fwitz.math.fractal.escape.EscapeFunction;
-import net.fwitz.math.plot.complex.escape.color.NewtonsMethodDarkZero;
-import net.fwitz.math.plot.complex.escape.EscapeTimePlot;
+import net.fwitz.math.plot.binary.escape.color.NewtonsMethodDarkZero;
+import net.fwitz.math.plot.binary.escape.EscapeTimePlot;
 
 import java.util.function.Function;
 
@@ -14,9 +14,10 @@ public class NewtonsMethodPlot {
     }
 
     public static void renderEscape(String name, EscapeFunction escapeFn) {
-        new EscapeTimePlot(name)
+        EscapeTimePlot.complex(name)
                 .computeFn(escapeFn)
-                .domainBound(-3.5, -2.5, 3.5, 2.5)
+                .domainX(-3.5, 3.5)
+                .domainY(-2.5, 2.5)
                 .size(700, 500)
                 .colorFn(new NewtonsMethodDarkZero())
                 .render();

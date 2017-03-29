@@ -1,7 +1,7 @@
 package net.fwitz.math.main.complex.functions.examples.simple;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.complex.ComplexFunctionPlot;
+import net.fwitz.math.plot.binary.complex.ComplexFunctionPlot;
 
 import static java.lang.Math.PI;
 
@@ -11,8 +11,8 @@ public class JedSoftExample2 {
 
     public static void main(String[] args) {
         new ComplexFunctionPlot(FN_NAME)
-                .domainRe(-PI, PI)
-                .domainIm(-PI, PI)
+                .domainX(-PI, PI)
+                .domainY(-PI, PI)
                 .computeFn(JedSoftExample2::fn)
                 .render();
     }

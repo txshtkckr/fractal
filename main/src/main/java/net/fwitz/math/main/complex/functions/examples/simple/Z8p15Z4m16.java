@@ -1,14 +1,15 @@
 package net.fwitz.math.main.complex.functions.examples.simple;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.complex.ComplexFunctionPlot;
+import net.fwitz.math.plot.binary.complex.ComplexFunctionPlot;
 
 public class Z8p15Z4m16 {
     public static final String FN_NAME = "f(z) = z^8 + 15z^4 - 16";
 
     public static void main(String[] args) {
         new ComplexFunctionPlot(FN_NAME)
-                .domainBound(-3.5, -2.5, 3.5, 2.5)
+                .domainX(-3.5, 3.5)
+                .domainX(-2.5, 2.5)
                 .size(700, 500)
                 .computeFn(Z8p15Z4m16::f)
                 .render();

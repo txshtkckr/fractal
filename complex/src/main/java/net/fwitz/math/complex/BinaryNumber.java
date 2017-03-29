@@ -441,4 +441,18 @@ public abstract class BinaryNumber<T extends BinaryNumber<T>> implements Seriali
     public T csch() {
         return sinh().inverse();
     }
+
+    /**
+     * Forces this binary number to be interpreted as a complex number.
+     */
+    public Complex asComplex() {
+        return Complex.complex(x(), y());
+    }
+
+    /**
+     * Forces this binary number to be interpreted as a split-complex  (hyperbolic) number.
+     */
+    public Complex asSplitComplex() {
+        return Complex.complex(x(), y());
+    }
 }

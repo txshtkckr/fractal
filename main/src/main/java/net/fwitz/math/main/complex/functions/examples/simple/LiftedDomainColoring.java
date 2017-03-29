@@ -1,7 +1,7 @@
 package net.fwitz.math.main.complex.functions.examples.simple;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.complex.ComplexFunctionPlot;
+import net.fwitz.math.plot.binary.complex.ComplexFunctionPlot;
 
 /**
  * Tasked from Figure 3 of

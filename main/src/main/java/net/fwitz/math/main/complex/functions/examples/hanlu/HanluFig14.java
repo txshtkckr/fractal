@@ -1,8 +1,8 @@
 package net.fwitz.math.main.complex.functions.examples.hanlu;
 
 import net.fwitz.math.complex.Complex;
-import net.fwitz.math.plot.complex.color.DomainColoringHanlu;
-import net.fwitz.math.plot.complex.ComplexFunctionPlot;
+import net.fwitz.math.plot.binary.complex.color.DomainColoringHanlu;
+import net.fwitz.math.plot.binary.complex.ComplexFunctionPlot;
 
 import static net.fwitz.math.complex.Complex.complex;
 

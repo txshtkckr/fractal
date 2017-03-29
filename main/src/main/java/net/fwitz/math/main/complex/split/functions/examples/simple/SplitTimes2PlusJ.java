@@ -1,7 +1,7 @@
 package net.fwitz.math.main.complex.split.functions.examples.simple;
 
-import net.fwitz.math.plot.complex.split.SplitComplexFunctionPlot;
-import net.fwitz.math.plot.complex.split.color.DomainColoringSplit;
+import net.fwitz.math.plot.binary.split.SplitComplexFunctionPlot;
+import net.fwitz.math.plot.binary.split.color.DomainColoringSplit;
 
 import static net.fwitz.math.complex.SplitComplex.splitComplex;
 

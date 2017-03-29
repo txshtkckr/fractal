@@ -1073,14 +1073,6 @@ public class Complex extends BinaryNumber<Complex> {
         return new Complex(r * rcos(theta), r * rsin(theta));
     }
 
-    /**
-     * @return the {@link SplitComplex} dual for this complex number.
-     * @see SplitComplex#asComplex()
-     */
-    public SplitComplex asSplitComplex() {
-        return SplitComplex.splitComplex(x, y);
-    }
-
     // compute erfcx(z) = exp(z^2) erfz(z)
     private static Complex erfcx(Complex z, double relerr) {
         return w(z.timesY(), relerr);

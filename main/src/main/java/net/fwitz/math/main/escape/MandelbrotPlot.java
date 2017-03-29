@@ -3,14 +3,14 @@ package net.fwitz.math.main.escape;
 import net.fwitz.math.complex.Complex;
 import net.fwitz.math.fractal.escape.EscapeFunction;
 import net.fwitz.math.fractal.escape.EscapeTimeResult;
-import net.fwitz.math.plot.complex.escape.color.EscapeTimePaletteFunction;
-import net.fwitz.math.plot.palette.PaletteVGA8bitRGB;
-import net.fwitz.math.plot.complex.escape.EscapeTimePanel;
-import net.fwitz.math.plot.complex.escape.EscapeTimePlot;
+import net.fwitz.math.plot.binary.escape.EscapeTimePanel;
+import net.fwitz.math.plot.binary.escape.EscapeTimePlot;
+import net.fwitz.math.plot.binary.escape.color.EscapeTimePaletteFunction;
+import net.fwitz.math.plot.renderer.palette.PaletteVGA8bitRGB;
 
 import javax.swing.*;
 
-import static net.fwitz.math.plot.complex.AbstractComplexFunctionPanel.action;
+import static net.fwitz.math.plot.renderer.ImageRendererPanel.action;
 
 public class MandelbrotPlot {
     private static final double P_MIN = -2;
@@ -32,12 +32,13 @@ public class MandelbrotPlot {
     }
 
     private volatile EscapeFunction delegate = MANDELBROT;
-    private final EscapeTimePlot plot;
+    private final EscapeTimePlot<Complex> plot;
 
     private MandelbrotPlot() {
-        this.plot = new EscapeTimePlot("Mandelbrot (Escape time)")
+        this.plot = EscapeTimePlot.complex("Mandelbrot (Escape time)")
                 .computeFn(this::applyDelegate)
-                .domainBound(P_MIN, Q_MIN, P_MAX, Q_MAX)
+                .domainX(P_MIN, P_MAX)
+                .domainY(Q_MIN, Q_MAX)
                 .colorFn(EscapeTimePaletteFunction.escapeTime(new PaletteVGA8bitRGB()))
                 .decoratePanel(this::addListeners);
     }
@@ -58,20 +59,20 @@ public class MandelbrotPlot {
                 .build();
     }
 
-    private void toggleJulia(EscapeTimePanel panel) {
+    private void toggleJulia(EscapeTimePanel<Complex> panel) {
         if (delegate != MANDELBROT) {
             // Switching from Julia to Mandelbrot, so it doesn't matter where the mouse is
             delegate = MANDELBROT;
             panel.reset();
         } else {
-            panel.getMouseLocationAsComplexValue().ifPresent(c0 -> {
+            panel.getMouseLocationAsValue().ifPresent(c0 -> {
                 delegate = julia(c0);
                 panel.reset();
             });
         }
     }
 
-    private void addListeners(EscapeTimePanel panel) {
+    private void addListeners(EscapeTimePanel<Complex> panel) {
         panel.getInputMap().put(KeyStroke.getKeyStroke('j'), "toggleJulia");
         panel.getActionMap().put("toggleJulia", action(e -> toggleJulia(panel)));
     }
