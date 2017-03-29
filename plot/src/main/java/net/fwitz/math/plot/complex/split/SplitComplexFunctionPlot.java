@@ -1,14 +1,14 @@
 package net.fwitz.math.plot.complex.split;
 
 import net.fwitz.math.complex.SplitComplex;
-import net.fwitz.math.plot.complex.color.DomainColoringAdvanced;
+import net.fwitz.math.plot.complex.split.color.DomainColoringSplit;
 
 public class SplitComplexFunctionPlot
         extends AbstractSplitComplexFunctionPlot<SplitComplexFunctionPlot, SplitComplexFunctionPanel, SplitComplex> {
 
     public SplitComplexFunctionPlot(String title) {
         super(title);
-        colorFn(new DomainColoringAdvanced());
+        colorFn(new DomainColoringSplit());
     }
 
     @Override

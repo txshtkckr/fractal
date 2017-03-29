@@ -34,7 +34,7 @@ import static net.fwitz.math.complex.RealMath.rtanh;
  * and encourage mistakes.  As this class is immutable, none of its method will
  * </p>
  */
-public class Complex implements Serializable {
+public class Complex implements BinaryNumber<Complex> {
     /**
      * The maximum number of roots that may be requested using {@link #roots(int)}.
      */

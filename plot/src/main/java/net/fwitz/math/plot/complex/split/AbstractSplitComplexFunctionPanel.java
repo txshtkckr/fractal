@@ -15,6 +15,7 @@ import java.util.function.Function;
 import java.util.stream.DoubleStream;
 
 import static java.util.Objects.requireNonNull;
+import static net.fwitz.math.complex.SplitComplex.splitComplex;
 
 public abstract class AbstractSplitComplexFunctionPanel<V>
         extends ImageRendererPanel<SplitComplexFunctionRenderer<V>>
