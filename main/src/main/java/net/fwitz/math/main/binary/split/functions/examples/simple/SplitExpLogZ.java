@@ -1,12 +1,11 @@
 package net.fwitz.math.main.binary.split.functions.examples.simple;
 
-import net.fwitz.math.binary.split.SplitComplex;
 import net.fwitz.math.plot.binary.split.SplitComplexFunctionPlot;
 
-public class SplitInverseZ {
+public class SplitExpLogZ {
     public static void main(String[] args) {
-        new SplitComplexFunctionPlot("1/z")
-                .computeFn(SplitComplex::inverse)
+        new SplitComplexFunctionPlot("e^(log z)")
+                .computeFn(w -> w.region1mapped(z -> z.log().exp()))
                 .render();
     }
 }

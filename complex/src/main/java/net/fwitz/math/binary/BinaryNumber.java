@@ -3,6 +3,7 @@ package net.fwitz.math.binary;
 import net.fwitz.math.binary.complex.Complex;
 
 import java.io.Serializable;
+import java.util.function.Function;
 
 import static java.lang.Double.doubleToLongBits;
 
@@ -281,6 +282,40 @@ public abstract class BinaryNumber<T extends BinaryNumber<T>> implements Seriali
     public abstract T log();
 
     /**
+     * Protects region information when it would otherwise be lost so that the result is remapped to the expected
+     * region when performing operations that would lose that information.
+     * <p>
+     * For example, to calculate {@code z^x}, {@link #pow(double)} normally takes the {@link #log()}, scales it
+     * using {@link #times(double)}, then takes the {@link #exp()} to get the result.  This works fine for complex
+     * numbers, but for dual and split-complex numbers, this result is always mapped to the primary region.
+     * In both cases, {@code x} is forced to a positive value, and in the case of split-complex numbers, the value
+     * will first be reflected across the line {@code y=x} if necessary to make {@code |x| > |y|}.  However, this
+     * sort of operation should more properly remain within the region where it was performed.
+     * </p><p>
+     * The purpose of this method is to perform any such mappings to the primary region up front, call the mutating
+     * function, then restore the appropriate region information afterwards.
+     * </p>
+     *
+     * @param fn the function to decorate with project into region 1 and reverse projection to the original region
+     * @return the result of mapping the value back to the original region after mutating it within the primary
+     */
+    public final T region1mapped(Function<? super T, ? extends T> fn) {
+        Function<? super T, ? extends T> dual = region1dual();
+        return dual.apply(fn.apply(dual.apply(self())));
+    }
+
+    /**
+     * Examines this point to determine a self-inverse function that will project this point into
+     * the primary region for this coordinate plane or back to where it came from.
+     * <p>
+     * The default implementation always uses {@link Function#identity()}.
+     * </p>
+     */
+    public Function<? super T, ? extends T> region1dual() {
+        return Function.identity();
+    }
+
+    /**
      * Returns the logarithm of this binary number in the given {@code base}.
      */
     public T logN(double base) {
@@ -324,14 +359,45 @@ public abstract class BinaryNumber<T extends BinaryNumber<T>> implements Seriali
     }
 
     /**
-     * Returns the result of raising this binary number to the given power, {@code z^x}.
+     * Returns the result of raising this binary number to the given power, {@code z^a}.
+     * <p>
+     * The default implementation delegates to {@link #log()}, {@link #times(double)}, and {@link #exp()}  to
+     * compute {@code z^a} as {@code e^(a log z)}, using {@link #region1mapped(Function)} to preserve the
+     * original region.
+     * </p>
      */
-    public abstract T pow(double x);
+    public T pow(double a) {
+        if (a == 0.0) {
+            return z(1, 0);
+        }
+        if (a == 1.0) {
+            return self();
+        }
+        if (a == -1.0) {
+            return inverse();
+        }
+        if (x() == 0.0 && y() == 0.0) {
+            return z(0, 0);
+        }
+
+        return region1mapped(z -> z.log().times(a).exp());
+    }
 
     /**
      * Returns the result of raising this binary number to the given power, {@code z^c}.
+     * The default implementation delegates to {@link #log()}, {@link #times(BinaryNumber)}, and {@link #exp()}  to
+     * compute {@code z^c} as {@code e^(c log z)}.
      */
-    public abstract T pow(BinaryNumber<? extends T> c);
+    public T pow(BinaryNumber<? extends T> c) {
+        if (c.y() == 0) {
+            return pow(c.x());
+        }
+        if (x() == 0.0 && y() == 0.0) {
+            return z(0, 0);
+        }
+
+        return region1mapped(z -> z.log().times(c).exp());
+    }
 
     /**
      * Returns the square root of this binary number.
@@ -454,5 +520,11 @@ public abstract class BinaryNumber<T extends BinaryNumber<T>> implements Seriali
      */
     public Complex asSplitComplex() {
         return Complex.complex(x(), y());
+    }
+
+    // Fix broken type inference
+    @SuppressWarnings("unchecked")
+    private T self() {
+        return (T) this;
     }
 }

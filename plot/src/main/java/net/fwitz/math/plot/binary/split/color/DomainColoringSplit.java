@@ -30,17 +30,17 @@ public class DomainColoringSplit implements SplitComplexColorFunction {
             case POS_NULL_VECTOR:
             case NEG_NULL_VECTOR:
                 return Color.LIGHT_GRAY;
-            case POS_X:
+            case REGION_I:
                 hueOffset = 0.875;
                 break;
-            case POS_Y:
+            case REGION_II:
                 hueOffset = 0.125;
                 invert = true;
                 break;
-            case NEG_X:
+            case REGION_III:
                 hueOffset = 0.375;
                 break;
-            case NEG_Y:
+            case REGION_IV:
                 hueOffset = 0.625;
                 invert = true;
                 break;

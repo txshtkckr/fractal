@@ -640,10 +640,6 @@ public class Complex extends BinaryNumber<Complex> {
      */
     @Override
     public Complex sin() {
-        // Handle this special case to make sure we don't end up with -0.0i when dealing with real numbers.
-        if (y == 0.0) {
-            return real(rsin(x));
-        }
         return new Complex(rsin(x) * rcosh(y), rcos(x) * rsinh(y));
     }
 
@@ -652,10 +648,6 @@ public class Complex extends BinaryNumber<Complex> {
      */
     @Override
     public Complex cos() {
-        // Handle this special case to make sure we don't end up with -0.0i when dealing with real numbers.
-        if (y == 0.0) {
-            return real(rcos(x));
-        }
         return new Complex(rcos(x) * rcosh(y), rsin(x) * rsinh(-y));
     }
 
@@ -688,7 +680,7 @@ public class Complex extends BinaryNumber<Complex> {
 
     /**
      * Returns the complex inverse sine of the given real value.
-     * This is equivalent to {@link Math#asin(double)}, except that its domain is ended by complex analysis.
+     * This is equivalent to {@link Math#asin(double)}, except that its domain is extended by complex analysis.
      * This is also a convenience method equivalent to first forming a complex number and using {@link #asin()}
      * on that, except that this method is slightly more efficient.
      */
@@ -751,7 +743,7 @@ public class Complex extends BinaryNumber<Complex> {
 
     /**
      * Returns the complex inverse sine of the given real value.
-     * This is equivalent to {@link Math#acos(double)}, except that its domain is ended by complex analysis.
+     * This is equivalent to {@link Math#acos(double)}, except that its domain is extended by complex analysis.
      * This is also a convenience method equivalent to first forming a complex number and using {@link #acos()}
      * on that, except that this method is slightly more efficient.
      * The algorithm used is from <cite>Hull, T. 1997. Implementing the Complex Arcsine and
@@ -1095,6 +1087,6 @@ public class Complex extends BinaryNumber<Complex> {
     }
 
     public static void main(String[] args) {
-        System.out.println(ONE_OVER_2_I);
+        System.out.println(real(Math.PI / 2).sin());
     }
 }

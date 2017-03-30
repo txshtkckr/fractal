@@ -3,6 +3,8 @@ package net.fwitz.math.binary.split;
 import net.fwitz.math.binary.BinaryNumber;
 import net.fwitz.math.binary.complex.Complex;
 
+import java.util.function.Function;
+
 import static net.fwitz.math.binary.RealMath.rabs;
 import static net.fwitz.math.binary.RealMath.ratanh;
 import static net.fwitz.math.binary.RealMath.rcos;
@@ -12,8 +14,6 @@ import static net.fwitz.math.binary.RealMath.rlog;
 import static net.fwitz.math.binary.RealMath.rlog1p;
 import static net.fwitz.math.binary.RealMath.rsin;
 import static net.fwitz.math.binary.RealMath.rsinh;
-import static net.fwitz.math.binary.RealMath.rtan;
-import static net.fwitz.math.binary.RealMath.rtanh;
 
 public class SplitComplex extends BinaryNumber<SplitComplex> {
     private static final SplitComplex NaN = new SplitComplex(Double.NaN, Double.NaN);
@@ -93,6 +93,41 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
         return new SplitComplex(x / modulus, -y / modulus);
     }
 
+
+    // See comments on abs() to get started.  This tells us that for the polar decomposition
+    //    x + jy = r exp(ja)
+    // We know that
+    //    x = r cosh a
+    //    y = r sinh a
+    // From this we can get a as follows::
+    //   y/x = (r sinh a) / (r cosh a)
+    //   y/x = tanh a
+    //     a = atanh(y/x)  [ take atanh of both sides, then swap ]
+    @Override
+    public double arg() {
+        if (isNaN()) {
+            return Double.NaN;
+        }
+
+        SplitComplex z = region1dual().apply(this);
+
+        // If x is 0, then y must also be 0 or the region mapping would have swapped them.
+        return (x == 0) ? 0 : ratanh(z.y() / z.x());
+    }
+
+    // What is 'r' for a polar coordinates conversion in split-complex numbers?
+    // Assume that x + jy has a polar decomposition as r exp(ja).  Then:
+    //     x + jy = r exp(ja)
+    //     x + jy =  r [cosh a + j sinh a]
+    // 1 and j are orthogonal, so separating the real and imaginary components gives:
+    //     x = r cosh a
+    //     y = r sinh a
+    // To get r, we square both x and y, then subtract, using the identity that (cosh a)^2 - (sinh a)^2 = 1:
+    //   x^2 = r^2 (cosh a)^2
+    //   y^2 = r^2 (sinh a)^2
+    //   r^2 = x^2 - y^2    [ swapped sides, factored out r^2, and used the identity ]
+    //   r = sqrt(|x^2 - y^2|)
+
     /**
      * {@inheritDoc}
      * <p>
@@ -159,7 +194,7 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
      * this value must be used.  Its meaning therefore parallels {@link Complex#abs2()}, not {@link Complex#abs()}.
      * </p><p>
      * Yet there is also a major difference in behavior as compared to {@code Complex.abs2()}: the value is negative
-     * when {@code |y| > |x|}!  Calling this method {@code abs2()} is therefore obviously not a good idea.  So to
+     * when {@code |y| > |x|}.  Calling this method {@code abs2()} is therefore obviously not a good idea.  So to
      * keep confusion to a minimum, this code uses the following conventions:
      * </p>
      * <ul>
@@ -188,7 +223,7 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
         double r = Math.exp(x);
 
         //noinspection SuspiciousNameCombination
-        return new SplitComplex(r * Math.cosh(y), y * Math.sinh(y));
+        return new SplitComplex(r * Math.cosh(y), r * Math.sinh(y));
     }
 
     @Override
@@ -206,22 +241,54 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
             return ZERO;
         }
 
-        double r = rexp(logabs() * x);
-        double theta = arg() * x;
-        return polar(r, theta);
+        return region1mapped(z -> {
+            double r = rexp(z.logabs() * a);
+            double theta = z.arg() * a;
+            return polar(r, theta);
+        });
     }
 
-    @Override
-    public SplitComplex pow(BinaryNumber<? extends SplitComplex> c) {
-        if (c.y() == 0) {
-            return pow(c.x());
-        }
-        if (x == 0.0 && y == 0.0) {
-            return ZERO;
+    /**
+     * {@inheritDoc}
+     * ><p>
+     * The function that is returned is self-inverting, but it is only valid for this point and other points
+     * with the same {@link Classification Classification}.  Points in other regions will be mapped consistently,
+     * but not to {@code REGION_1}.  For example, if {@code region1dual()} is called on the value {@code 2 - j5},
+     * that means it is in {@link Classification#REGION_IV REGION_IV}, where negative {@code y} values dominate.
+     * The returned function is then {@link SplitComplex#timesNegativeY()}, which reflects values over the line
+     * {@code y = -x}, swapping regions {@code I} and {@code IV}.  Calling it on the original value will resul
+     * in {@code 5 - 2j} (the values are swapped and negated).  Repeating this operation restores the original
+     * value, {@code 2 - j5}.
+     * </p><p>
+     * However, this operation also swaps regions {@code II} and {@code III}, so if you hold onto the function
+     * and call it on {@code -5 + 2j}, the result will be {@code -2 + 5j}, not {@code 5 - 2j} as would be
+     * expected when mapping that value to {@code REGION_I} directly.
+     * </p><p>
+     * Note that any value that isn't in region {@code II}, {@code III}, or {@code IV} just returns
+     * {@link Function#identity()}, as either the value is already in {@code I} or there is no way to
+     * map it there.
+     * </p>
+     */
+    public Function<SplitComplex, SplitComplex> region1dual() {
+        // For speed, test directly instead of using classify()
+        if (y > x) {
+            if (y > -x) {
+                // REGION_II
+                return SplitComplex::timesY;
+            }
+            if (y < -x) {
+                // REGION_III
+                return SplitComplex::negative;
+            }
+        } else if (y < x) {
+            if (y < -x) {
+                // REGION_IV
+                return SplitComplex::timesNegativeY;
+            }
         }
 
-        // Probably possible to shortcut this, like Complex.pow(Complex) does?
-        return log().times(c).exp();
+        // Already in REGION_I, or something else that can't be mapped onto it
+        return Function.identity();
     }
 
     @Override
@@ -244,12 +311,6 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
     //    sin(x + jy) = sin(x) cos(y) + j cos(x) sin(y)            [ sin(jy) = j sin(y), cos(jy) = cos(y) ]
     @Override
     public SplitComplex sin() {
-        if (y == 0) {
-            return splitComplex(rsin(x), 0);
-        }
-        if (x == 0) {
-            return splitComplex(0, rsin(y));
-        }
         return new SplitComplex(rsin(x) * rcos(y), rcos(x) * rsin(y));
     }
 
@@ -259,59 +320,8 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
     //    cos(x + jy) = cos(x) cos(y) - j sin(x) sin(y)            [ sin(jy) = j sin(y), cos(jy) = cos(y) ]
     @Override
     public SplitComplex cos() {
-        if (y == 0) {
-            return splitComplex(rcos(x), 0);
-        }
-        if (x == 0) {
-            return splitComplex(rcos(y), 0);
-        }
         return new SplitComplex(rcos(x) * rcos(y), -rsin(x) * rsin(y));
     }
-
-    // Now we can work out how the tangent is affected:
-    //    tan(a) = sin(a) / cos(a)
-    //    tan(jy) = sin(jy) / cos(jy)                              [ substitute a = jy ]
-    //    tan(jy) = j sin(y) / cos(y)                              [ sin(jy) = j sin(y), cos(jy) = cos(y) ]
-    //    tan(jy) = j tan(y)                                       [ def. of tangent ]
-    // The double angle formula is messy, so not messing with it for now.
-    @Override
-    public SplitComplex tan() {
-        if (y == 0) {
-            return splitComplex(rtan(x), 0);
-        }
-        if (x == 0) {
-            return splitComplex(0, rtan(y));
-        }
-
-        // Inline sin and cos to avoid calculating sin and cos values multiple times
-        double sx = rsin(x);
-        double cx = rcos(x);
-        double sy = rsin(y);
-        double cy = rcos(y);
-        SplitComplex numer = new SplitComplex(sx * cy, cx * sy);
-        SplitComplex denom = new SplitComplex(cx * cy, -sx * sy);
-        return numer.div(denom);
-    }
-
-    @Override
-    public SplitComplex cot() {
-        if (y == 0) {
-            return splitComplex(1 / rtan(x), 0);
-        }
-        if (x == 0) {
-            return splitComplex(0, 1 / rtan(y));
-        }
-
-        // Inline sin and cos to avoid calculating sin and cos values multiple times
-        double sx = rsin(x);
-        double cx = rcos(x);
-        double sy = rsin(y);
-        double cy = rcos(y);
-        SplitComplex numer = new SplitComplex(cx * cy, -sx * sy);
-        SplitComplex denom = new SplitComplex(sx * cy, cx * sy);
-        return numer.div(denom);
-    }
-
 
     // For sinh, the arguments are similar to those for sin and cos.
     // For sinh, all of the powers of j are odd, so there is a single common j that can be factored out, giving:
@@ -324,12 +334,6 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
     //    sinh(x + jy) = sinh(x) cosh(y) + j cosh(x) sinh(y)   [ sinh(jy) = j sinh(y), cosh(jy) = cosh(y) ]
     @Override
     public SplitComplex sinh() {
-        if (y == 0) {
-            return splitComplex(rsinh(x), 0);
-        }
-        if (x == 0) {
-            return splitComplex(0, rsinh(y));
-        }
         return splitComplex(rsinh(x) * rcosh(y), rcosh(x) * rsinh(y));
     }
 
@@ -339,88 +343,39 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
     //    cosh(x + jy) = cosh(x) cosh(y) + j sinh(x) sinh(y)   [ sinh(jy) = j sinh(y), cosh(jy) = cosh(y) ]
     @Override
     public SplitComplex cosh() {
-        if (y == 0) {
-            return splitComplex(rcosh(x), 0);
-        }
-        if (x == 0) {
-            return splitComplex(rcosh(y), 0);
-        }
         return splitComplex(rcosh(x) * rcosh(y), rsinh(x) * rsinh(y));
     }
 
-    // Since you can factor j out of sinh and drop it from cosh, this implies that j can be factored out of tanh.
-    // Not going beyond this for now, though.
-    @Override
-    public SplitComplex tanh() {
-        if (y == 0) {
-            return splitComplex(rtanh(x), 0);
-        }
-        if (x == 0) {
-            return splitComplex(0, rtanh(y));
-        }
 
-        // Inline sinh and cosh to avoid calculating sinh and cosh values multiple times
-        double sx = rsinh(x);
-        double cx = rcosh(x);
-        double sy = rsinh(y);
-        double cy = rcosh(y);
-        SplitComplex numer = new SplitComplex(sx * cy, cx * sy);
-        SplitComplex denom = new SplitComplex(cx * cy, sx * sy);
-        return numer.div(denom);
-    }
-
-    @Override
-    public SplitComplex coth() {
-        if (y == 0) {
-            return splitComplex(1 / rtanh(x), 0);
-        }
-        if (x == 0) {
-            return splitComplex(0, 1 / rtanh(y));
-        }
-
-        // Inline sinh and cosh to avoid calculating sinh and cosh values multiple times
-        double sx = rsinh(x);
-        double cx = rcosh(x);
-        double sy = rsinh(y);
-        double cy = rcosh(y);
-        SplitComplex numer = new SplitComplex(cx * cy, sx * sy);
-        SplitComplex denom = new SplitComplex(sx * cy, cx * sy);
-        return numer.div(denom);
-    }
-
-    @Override
-    public double arg() {
-        if (isNaN()) {
-            return Double.NaN;
-        }
-        if (x == 0 && y == 0) {
-            return y;
-        }
-        double absX = rabs(x);
-        double absY = rabs(y);
-        if (absX == absY) {
-            return Double.NaN;
-        }
-
-        double slope = (absX < absY) ? (x / y) : (y / x);
-        return ratanh(slope);
-    }
-
+    /**
+     * @see Classification
+     */
     public Classification classify() {
+        if (y > -x) {
+            if (y < x) {
+                return Classification.REGION_I;
+            }
+            if (y > x) {
+                return Classification.REGION_II;
+            }
+        } else if (y < -x) {
+            if (y > x) {
+                return Classification.REGION_III;
+            }
+            if (y < x) {
+                return Classification.REGION_IV;
+            }
+        }
+
         if (isNaN()) {
             return Classification.NAN;
         }
-        if (x == 0 && y == 0) {
+
+        // We are on y = x or y = -x
+        if (x == 0) {
             return Classification.ZERO;
         }
-        double absX = rabs(x);
-        double absY = rabs(y);
-        if (absX > absY) {
-            return (x > 0) ? Classification.POS_X : Classification.NEG_X;
-        }
-        if (absX < absY) {
-            return (y > 0) ? Classification.POS_Y : Classification.NEG_Y;
-        }
+
         return (x == y) ? Classification.POS_NULL_VECTOR : Classification.NEG_NULL_VECTOR;
     }
 
@@ -438,7 +393,42 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
 
 
     /**
-     * Identifies the broad categorization of the point provided
+     * Identifies the broad categorization of the point provided.
+     * <p>
+     * The hyperbolic plane is divided into for regions by the null vector axes y = x and y = -x
+     * </p>
+     * <pre>
+     *    \  II   / (positive null vectors)
+     *     \     / y = x
+     *      \   /
+     *       \ /
+     *  III   0   I
+     *       / \
+     *      /   \
+     *     /     \ y = -x
+     *    /  IV   \ (negative null vectors)
+     *
+     *  </pre>
+     * <p>
+     * The following tests are used to determine which region the point is in:
+     * </p>
+     * <ul>
+     * <li><strong>{@code y > -x}</strong> &mdash; to the upper-right of {@code y = -x}, so in {@link #REGION_I} or
+     * {@link #REGION_II} (or on {@link #POS_NULL_VECTOR y = x} between them).</li>
+     * <li><strong>{@code y > x}</strong> &mdash; to the upper-left of {@code y = x}, so in {@link #REGION_II} or
+     * {@link #REGION_III} (or on {@link #NEG_NULL_VECTOR y = -x} between them).</li>
+     * <li><strong>{@code y < -x}</strong> &mdash; to the lower-left of {@code y = -x}, so in {@link #REGION_III} or
+     * {@link #REGION_IV} (or on {@link #POS_NULL_VECTOR y = x} between them).</li>
+     * <li><strong>{@code y < x}</strong> &mdash; to the lower-right of {@code y = x}, so in {@link #REGION_I} or
+     * {@link #REGION_IV} (or on {@link #NEG_NULL_VECTOR y = -x} between them).</li>
+     * </ul>
+     * If no pair of these conditions is met, then the point does not belong to any region.  The possibilities are:
+     * <ul>
+     * <li><strong>{@link #NAN}</strong> &mdash; either {@code x} or {@code y} is {@link Double#NaN}</li>
+     * <li><strong>{@link #ZERO}</strong> &mdash; both {@code x} and {@code y} are {@code 0}</li>
+     * <li><strong>{@link #POS_NULL_VECTOR}</strong> &mdash; on the line {@code y = x}, but not at {@code 0}.</li>
+     * <li><strong>{@link #NEG_NULL_VECTOR}</strong> &mdash; on the line {@code y = -x}, but not at {@code 0}.</li>
+     * </ul>
      */
     public enum Classification {
         /**
@@ -463,23 +453,29 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
 
         /**
          * In the positive X-axis's quadrant, as divided by the lines {@code y = x} and {@code y = -x}.
+         * In Region I, {@code x > 0} and {@code |x| > |y|}, so positive {@code x} values dominate.
+         * This is the "primary region" selected by {@link SplitComplex#region1mapped(Function)} .
          */
-        POS_X(splitComplex(1, 0)),
-
-        /**
-         * In the negative X-axis's quadrant, as divided by the lines {@code y = x} and {@code y = -x}.
-         */
-        NEG_X(splitComplex(-1, 0)),
+        REGION_I(splitComplex(1, 0)),
 
         /**
          * In the positive Y-axis's quadrant, as divided by the lines {@code y = x} and {@code y = -x}.
+         * In Region II, {@code y > 0} and {@code |y| > |x|}, so positive {@code y} values dominate.
          */
-        POS_Y(splitComplex(0, 1)),
+        REGION_II(splitComplex(0, 1)),
+
+        /**
+         * In the negative X-axis's quadrant, as divided by the lines {@code y = x} and {@code y = -x}.
+         * In Region III, {@code x < 0} and {@code |x| > |y|}, so negative {@code x} values dominate.
+         */
+        REGION_III(splitComplex(-1, 0)),
 
         /**
          * In the negative Y-axis's quadrant, as divided by the lines {@code y = x} and {@code y = -x}.
+         * In Region IV, {@code y < 0} and {@code |y| > |x|}, so negative {@code y} values dominate.
          */
-        NEG_Y(splitComplex(0, -1));
+        REGION_IV(splitComplex(0, -1));
+
 
         private final SplitComplex basis;
         private final boolean nullVector;
