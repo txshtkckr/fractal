@@ -2,33 +2,33 @@ package net.fwitz.math.fractal.escape;
 
 import net.fwitz.math.binary.complex.Complex;
 
+import java.util.OptionalDouble;
+
+import static java.util.Objects.requireNonNull;
+
 public class EscapeTimeResult {
     private final boolean escaped;
     private final int iters;
-    private final int maxIters;
     private final Complex z;
+    private final OptionalDouble smoothing;
 
-    private EscapeTimeResult(boolean escaped, int iters, int maxIters, Complex z) {
+    private EscapeTimeResult(boolean escaped, int iters, Complex z, OptionalDouble smoothing) {
         this.escaped = escaped;
         this.iters = iters;
-        this.maxIters = maxIters;
-        this.z = z;
+        this.z = requireNonNull(z, "z");
+        this.smoothing = requireNonNull(smoothing, "smoothing");
     }
 
-    public static EscapeTimeResult contained(int maxIters, Complex z) {
-        return new EscapeTimeResult(false, 0, maxIters, z);
+    public static EscapeTimeResult contained(Complex z, OptionalDouble smoothing) {
+        return new EscapeTimeResult(false, 0, z, smoothing);
     }
 
-    public static EscapeTimeResult escaped(int iters, int maxIters, Complex z) {
-        return new EscapeTimeResult(true, iters, maxIters, z);
+    public static EscapeTimeResult escaped(int iters, Complex z, OptionalDouble smoothing) {
+        return new EscapeTimeResult(true, iters, z, smoothing);
     }
 
     public int iters() {
         return iters;
-    }
-
-    public int maxIters() {
-        return maxIters;
     }
 
     public Complex z() {
@@ -43,11 +43,16 @@ public class EscapeTimeResult {
         return !escaped;
     }
 
+    public OptionalDouble smoothing() {
+        return smoothing;
+    }
+
     @Override
     public String toString() {
         return "EscapeFunction.Result[escaped=" + escaped +
                 "; iters=" + iters +
-                "; maxIters=" + maxIters +
-                "; z=" + z + ']';
+                "; z=" + z +
+                "; smoothing=" + smoothing +
+                ']';
     }
 }

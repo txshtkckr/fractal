@@ -2,8 +2,9 @@ package net.fwitz.math.main.binary.escape;
 
 import net.fwitz.math.binary.complex.Complex;
 import net.fwitz.math.fractal.escape.EscapeFunction;
-import net.fwitz.math.plot.binary.escape.color.EscapeTimeColor;
 import net.fwitz.math.plot.binary.escape.EscapeTimePlot;
+import net.fwitz.math.plot.binary.escape.color.EscapeTimePaletteFunction;
+import net.fwitz.math.plot.renderer.palette.PaletteVGA256;
 
 // https://www.flickr.com/photos/fractal_ken/3476756762
 public class SignOfTheSunGod {
@@ -24,7 +25,7 @@ public class SignOfTheSunGod {
                         .build())
                 .domainX(P_MIN, P_MAX)
                 .domainY(Q_MIN, Q_MAX)
-                .colorFn(new EscapeTimeColor())
+                .colorFn(EscapeTimePaletteFunction.escapeTime(PaletteVGA256.withoutLast8()))
                 .render();
     }
 }

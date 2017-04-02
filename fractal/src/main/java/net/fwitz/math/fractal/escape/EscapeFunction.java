@@ -122,6 +122,38 @@ public interface EscapeFunction extends Function<Complex, EscapeTimeResult> {
         Builder maxIters(int maxIters);
 
         /**
+         * {@link #enableConvergenceSmoothing(double) Enable convergence smoothing} using the default adjustment
+         * factor of {@code 1.0}.
+         */
+        default Builder enableConvergenceSmoothing() {
+            return enableConvergenceSmoothing(1.0);
+        }
+
+        /**
+         * Enables smoothed magnitude tracking for convergent values so that this information will be included in the
+         * {@link EscapeTimeResult}.  Both smoothing algorithms have a cost to them, so they are off by default.
+         *
+         * @param adjustFactor a multiplier for tuning the smoothing algorithm
+         */
+        Builder enableConvergenceSmoothing(double adjustFactor);
+
+        /**
+         * {@link #enableDivergenceSmoothing(double) Enable divergence smoothing} using the default adjustment
+         * factor of {@code 1.0}.
+         */
+        default Builder enableDivergenceSmoothing() {
+            return enableDivergenceSmoothing(1.0);
+        }
+
+        /**
+         * Enables smoothed magnitude tracking for divergent values so that this information will be included in the
+         * {@link EscapeTimeResult}.  Both smoothing algorithms have a cost to them, so they are off by default.
+         *
+         * @param adjustFactor a multiplier for tuning the smoothing algorithm
+         */
+        Builder enableDivergenceSmoothing(double adjustFactor);
+
+        /**
          * @return the new escape function
          */
         EscapeFunction build();

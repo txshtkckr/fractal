@@ -3,6 +3,7 @@ package net.fwitz.math.fractal.escape.newton;
 import net.fwitz.math.binary.complex.Complex;
 import net.fwitz.math.fractal.escape.EscapeFunction;
 
+import java.util.OptionalDouble;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
@@ -41,24 +42,24 @@ public class NewtonsMethod {
             Complex z = c;
             for (int i = 1; i < maxIters; ++i) {
                 if (!Double.isFinite(z.x()) || !Double.isFinite(z.y())) {
-                    return contained(maxIters, z);
+                    return contained(z, OptionalDouble.empty());
                 }
 
                 Complex dfz = df.apply(z);
                 if (dfz.abs() < EPSILON) {
                     // Assume non-convergence rather than divide by such a tiny value
-                    return contained(maxIters, z);
+                    return contained(z, OptionalDouble.empty());
                 }
 
                 Complex fz = f.apply(z);
                 Complex zPrev = z;
                 z = z.minus(fz.div(dfz));
                 if (z.minus(zPrev).abs() <= TOLERANCE * z.abs()) {
-                    return escaped(i, maxIters, z);
+                    return escaped(i, z, OptionalDouble.empty());
                 }
             }
 
-            return contained(maxIters, z);
+            return contained(z, OptionalDouble.empty());
         };
     }
 

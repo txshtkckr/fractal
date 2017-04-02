@@ -21,12 +21,6 @@ public class EscapeTimePaletteFunction implements EscapeTimeColorFunction {
 
     @Override
     public Color apply(Complex c, EscapeTimeResult result) {
-        if (result.escaped()) {
-            int max = palette.size() - 1;
-            int index = result.iters() % max;
-            return palette.index((index > 0) ? index : max);
-        }
-
-        return palette.index(0);
+        return result.escaped() ? palette.indexExcluding0(result.iters()) : palette.index(0);
     }
 }

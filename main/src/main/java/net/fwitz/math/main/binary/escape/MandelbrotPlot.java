@@ -5,8 +5,8 @@ import net.fwitz.math.fractal.escape.EscapeFunction;
 import net.fwitz.math.fractal.escape.EscapeTimeResult;
 import net.fwitz.math.plot.binary.escape.EscapeTimePanel;
 import net.fwitz.math.plot.binary.escape.EscapeTimePlot;
-import net.fwitz.math.plot.binary.escape.color.EscapeTimePaletteFunction;
-import net.fwitz.math.plot.renderer.palette.PaletteVGA8bitRGB;
+import net.fwitz.math.plot.binary.escape.color.EscapeTimeInterpolator;
+import net.fwitz.math.plot.renderer.palette.EscapeTimePalette;
 
 import javax.swing.*;
 
@@ -18,55 +18,72 @@ public class MandelbrotPlot {
     private static final double Q_MIN = -1.5;
     private static final double Q_MAX = 1.5;
     private static final int ITERS = 1000;
+    private static final int BAILOUT_RADIUS = 1 << 8;
+    private static final int BAILOUT = BAILOUT_RADIUS * BAILOUT_RADIUS;
 
-    private static final EscapeFunction MANDELBROT = EscapeFunction.builder()
-            .includeInit()
-            .step((c, z) -> z.pow2().plus(c))
-            .escapeTest(z -> z.abs() >= 2)
-            .shortcutContainmentTest(MandelbrotPlot::inMainCardioidOrCircle)
-            .maxIters(ITERS)
-            .build();
+    private final double power;
+    private final EscapeFunction mandel;
 
     public static void main(String[] args) {
-        new MandelbrotPlot().render();
+        new MandelbrotPlot(2, true).render();
     }
 
-    private volatile EscapeFunction delegate = MANDELBROT;
+    private volatile EscapeFunction delegate;
     private final EscapeTimePlot<Complex> plot;
 
-    private MandelbrotPlot() {
+    public MandelbrotPlot() {
+        this(2, true);
+    }
+
+    public MandelbrotPlot(double power) {
+        this(power, false);
+    }
+
+    private MandelbrotPlot(double power, boolean useShortcut) {
+        this.power = power;
         this.plot = EscapeTimePlot.complex("Mandelbrot (Escape time)")
                 .computeFn(this::applyDelegate)
                 .domainX(P_MIN, P_MAX)
                 .domainY(Q_MIN, Q_MAX)
-                .colorFn(EscapeTimePaletteFunction.escapeTime(new PaletteVGA8bitRGB()))
+                .colorFn(new EscapeTimeInterpolator(power, BAILOUT_RADIUS, new EscapeTimePalette()))
                 .decoratePanel(this::addListeners);
+
+        EscapeFunction.Builder builder = EscapeFunction.builder()
+                .includeInit()
+                .step((c, z) -> z.pow(power).plus(c))
+                .escapeTest(z -> z.abs2() >= BAILOUT)
+                .maxIters(ITERS);
+        if (useShortcut) {
+            builder.shortcutContainmentTest(MandelbrotPlot::inMainCardioidOrCircle);
+        }
+        this.mandel = builder.build();
+        this.delegate = mandel;
     }
 
     private EscapeTimeResult applyDelegate(Complex c) {
         return delegate.apply(c);
     }
 
-    private void render() {
+    public void render() {
         plot.render();
     }
 
-    private static EscapeFunction julia(Complex c) {
+    private static EscapeFunction julia(Complex c, double power) {
         return EscapeFunction.builder()
-                .step((z0, z) -> z.pow2().plus(c))
-                .escapeTest(z -> z.abs() > 2)
+                .step((z0, z) -> z.pow(power).plus(c))
+                .escapeTest(z -> z.abs2() >= BAILOUT)
                 .maxIters(ITERS)
                 .build();
     }
 
     private void toggleJulia(EscapeTimePanel<Complex> panel) {
-        if (delegate != MANDELBROT) {
+        if (delegate != mandel) {
             // Switching from Julia to Mandelbrot, so it doesn't matter where the mouse is
-            delegate = MANDELBROT;
+            delegate = mandel;
             panel.reset();
         } else {
             panel.getMouseLocationAsValue().ifPresent(c0 -> {
-                delegate = julia(c0);
+                delegate = julia(c0, power);
                 panel.reset();
             });
         }

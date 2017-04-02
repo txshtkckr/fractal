@@ -274,7 +274,7 @@ public class PaletteVGA256 implements Palette {
         return COLORS[i];
     }
 
-    public Palette withoutLast8() {
+    public static Palette withoutLast8() {
         return WithoutLast8.INSTANCE;
     }
 

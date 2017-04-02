@@ -346,7 +346,6 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
         return splitComplex(rcosh(x) * rcosh(y), rsinh(x) * rsinh(y));
     }
 
-
     /**
      * @see Classification
      */

@@ -2,7 +2,9 @@ package net.fwitz.math.fractal.escape;
 
 import net.fwitz.math.binary.complex.Complex;
 
+import java.util.OptionalDouble;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -15,6 +17,8 @@ class DefaultEscapeFunction implements EscapeFunction {
     private final BiFunction<Complex, Complex, Complex> step;
     private final int maxIters;
     private final boolean includeInit;
+    private final OptionalDouble convergenceAdjust;
+    private final OptionalDouble divergenceAdjust;
 
     DefaultEscapeFunction(DefaultBuilder builder) {
         this.init = builder.init;
@@ -23,30 +27,61 @@ class DefaultEscapeFunction implements EscapeFunction {
         this.step = requireNonNull(builder.step, "step");
         this.maxIters = requireNonNull(builder.maxIters, "maxIters");
         this.includeInit = builder.includeInit;
+        this.convergenceAdjust = builder.convergenceSmoothingFactor.isPresent()
+                ? OptionalDouble.of(builder.convergenceSmoothingFactor.getAsDouble() / maxIters)
+                : OptionalDouble.empty();
+        this.divergenceAdjust = builder.divergenceSmoothingFactor.isPresent()
+                ? OptionalDouble.of(builder.divergenceSmoothingFactor.getAsDouble() / maxIters)
+                : OptionalDouble.empty();
     }
 
     public EscapeTimeResult apply(Complex c) {
+        Complex zOld = Complex.ZERO;
+
         // Note that if a shortcut test is used, then the fractal generation is faster, but since no
         // iterations are performed, the final value is the initial value rather than whatever iteration
-        // would have produced.
+        // would have produced and no convergence information is available.
         if (shortcutContainmentTest.test(c)) {
-            return EscapeTimeResult.contained(maxIters, c);
+            return EscapeTimeResult.contained(c, OptionalDouble.empty());
         }
 
-        int i = includeInit ? 1 : 0;
+        int i = 0;
         Complex z = init.apply(c);
+        Smoother cSmooth = convergenceAdjust.isPresent()
+                ? new ConvergenceSmoother(convergenceAdjust.getAsDouble(), includeInit ? z : c)
+                : Smoother.NULL;
+        Smoother dSmooth = divergenceAdjust.isPresent()
+                ? new DivergenceSmoother(divergenceAdjust.getAsDouble())
+                : Smoother.NULL;
+
+        if (includeInit) {
+            ++i;
+            cSmooth.accept(z);
+            dSmooth.accept(z);
+        }
+
         if (escapeTest.test(z)) {
-            return EscapeTimeResult.escaped(i, maxIters, z);
+            return escaped(i, z, dSmooth);
         }
 
         while (++i <= maxIters) {
             z = step.apply(c, z);
+            cSmooth.accept(z);
+            dSmooth.accept(z);
             if (escapeTest.test(z)) {
-                return EscapeTimeResult.escaped(i, maxIters, z);
+                return escaped(i, z, dSmooth);
             }
         }
 
-        return EscapeTimeResult.contained(maxIters, z);
+        return contained(z, cSmooth);
+    }
+
+    private EscapeTimeResult escaped(int iters, Complex z, Smoother dSmooth) {
+        return EscapeTimeResult.escaped(iters, z, dSmooth.finish());
+    }
+
+    private EscapeTimeResult contained(Complex z, Smoother cSmooth) {
+        return EscapeTimeResult.contained(z, cSmooth.finish());
     }
 
     static Builder builder() {
@@ -54,10 +89,65 @@ class DefaultEscapeFunction implements EscapeFunction {
     }
 
 
+    private interface Smoother extends Consumer<Complex> {
+        Smoother NULL = z -> {
+        };
+
+        default OptionalDouble finish() {
+            return OptionalDouble.empty();
+        }
+    }
+
+    private static class ConvergenceSmoother implements Smoother {
+        private final double adjust;
+
+        private Complex zOld;
+        private double sum;
+
+        private ConvergenceSmoother(double adjust, Complex zOld) {
+            this.adjust = adjust;
+            this.zOld = zOld;
+        }
+
+        @Override
+        public void accept(Complex z) {
+            sum += adjust * Math.exp(-1 / zOld.minus(z).abs());
+            zOld = z;
+        }
+
+        @Override
+        public OptionalDouble finish() {
+            return OptionalDouble.of(sum);
+        }
+    }
+
+    private static class DivergenceSmoother implements Smoother {
+        private final double adjust;
+
+        private double sum;
+
+        private DivergenceSmoother(double adjust) {
+            this.adjust = adjust;
+        }
+
+        @Override
+        public void accept(Complex z) {
+            sum += adjust * Math.exp(-1 / z.abs());
+        }
+
+        @Override
+        public OptionalDouble finish() {
+            return OptionalDouble.of(sum);
+        }
+    }
+
+
     private static class DefaultBuilder implements Builder {
         Function<Complex, Complex> init = c -> c;
         Predicate<Complex> shortcutContainmentTest = c -> false;
         boolean includeInit;
+        OptionalDouble convergenceSmoothingFactor = OptionalDouble.empty();
+        OptionalDouble divergenceSmoothingFactor = OptionalDouble.empty();
 
         Predicate<Complex> escapeTest;
         BiFunction<Complex, Complex, Complex> step;
@@ -106,6 +196,18 @@ class DefaultEscapeFunction implements EscapeFunction {
 
         public Builder includeInit() {
             this.includeInit = true;
+            return this;
+        }
+
+        @Override
+        public Builder enableConvergenceSmoothing(double adjustFactor) {
+            convergenceSmoothingFactor = OptionalDouble.of(adjustFactor);
+            return this;
+        }
+
+        @Override
+        public Builder enableDivergenceSmoothing(double adjustFactor) {
+            divergenceSmoothingFactor = OptionalDouble.of(adjustFactor);
             return this;
         }
 

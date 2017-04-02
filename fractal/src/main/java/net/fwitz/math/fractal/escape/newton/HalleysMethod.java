@@ -4,6 +4,7 @@ import net.fwitz.math.binary.complex.Complex;
 import net.fwitz.math.fractal.escape.EscapeFunction;
 import net.fwitz.math.fractal.escape.EscapeTimeResult;
 
+import java.util.OptionalDouble;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
@@ -39,7 +40,7 @@ public class HalleysMethod {
             Complex z = c;
             for (int i = 1; i < maxIters; ++i) {
                 if (!Double.isFinite(z.x()) || !Double.isFinite(z.y())) {
-                    return contained(maxIters, z);
+                    return contained(z, OptionalDouble.empty());
                 }
 
                 Complex fz = f.apply(z);
@@ -49,18 +50,18 @@ public class HalleysMethod {
                 Complex denom = dfz.pow2().times(2).minus(fz.times(d2fz));
                 if (denom.abs() < EPSILON) {
                     // Assume non-convergence rather than divide by such a tiny value
-                    return contained(maxIters, z);
+                    return contained(z, OptionalDouble.empty());
                 }
 
                 Complex numer = fz.times(2).times(dfz);
                 Complex zPrev = z;
                 z = z.minus(numer.div(denom));
                 if (z.minus(zPrev).abs() <= TOLERANCE * z.abs()) {
-                    return escaped(i, maxIters, z);
+                    return escaped(i, z, OptionalDouble.empty());
                 }
             }
 
-            return contained(maxIters, z);
+            return contained(z, OptionalDouble.empty());
         };
     }
 

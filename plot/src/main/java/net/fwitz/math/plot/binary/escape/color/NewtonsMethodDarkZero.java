@@ -13,26 +13,37 @@ public class NewtonsMethodDarkZero implements EscapeTimeColorFunction {
 
     @Override
     public Color apply(Complex c, EscapeTimeResult result) {
-        if (result.contained()) {
-            return Color.BLACK;
-        }
+        return result.contained() ? Color.BLACK : escaped(result);
+    }
 
+    private Color escaped(EscapeTimeResult result) {
         float hue = hue(result.z());
-        float val = (float) val(result.iters());
+        return color(hue, result.iters());
+    }
+
+    private Color color(float hue, int n) {
+        float val = (float) val(n);
         return Color.getHSBColor(hue, 1.0f, val);
     }
 
-    private double val(int iters) {
-        double relativeCloseness = (double) (GRADES - (iters % GRADES)) / GRADES;
+    private double val(int n) {
+        double relativeCloseness = (double) (GRADES - (n % GRADES)) / GRADES;
         return val(relativeCloseness);
+    }
+
+    private static float hue(Complex z) {
+        double hue = z.arg() * ONE_OVER_TWO_PI;
+        return (float) (hue - floor(hue));
     }
 
     double val(double closeness) {
         return 1 - 0.9 * closeness;
     }
 
-    private static float hue(Complex z) {
-        double hue = z.arg() * ONE_OVER_TWO_PI;
-        return (float) (hue - floor(hue));
+    public EscapeTimeColorFunction interpolated(double power, double radius) {
+        return new EscapeTimeInterpolator(power, radius, Color.BLACK, (result, n) -> {
+            float hue = hue(result.z());
+            return color(hue, n);
+        });
     }
 }
