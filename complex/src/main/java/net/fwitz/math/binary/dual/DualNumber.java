@@ -63,18 +63,18 @@ public class DualNumber extends BinaryNumber<DualNumber> {
     }
 
     @Override
-    public DualNumber timesY() {
+    public DualNumber timesJ() {
         //noinspection SuspiciousNameCombination
         return z(0, x);
     }
 
     @Override
-    public DualNumber timesY(double y) {
+    public DualNumber timesJ(double y) {
         return z(0, x * y);
     }
 
     @Override
-    public DualNumber timesNegativeY() {
+    public DualNumber timesNegativeJ() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -84,17 +84,17 @@ public class DualNumber extends BinaryNumber<DualNumber> {
     }
 
     @Override
-    public DualNumber divY() {
+    public DualNumber divJ() {
         return NaN;
     }
 
     @Override
-    public DualNumber divY(double y) {
+    public DualNumber divJ(double y) {
         return NaN;
     }
 
     @Override
-    public DualNumber divNegativeY() {
+    public DualNumber divNegativeJ() {
         return NaN;
     }
 

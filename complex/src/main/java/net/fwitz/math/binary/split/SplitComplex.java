@@ -48,19 +48,18 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
     }
 
     @Override
-    public SplitComplex timesY() {
+    public SplitComplex timesJ() {
         //noinspection SuspiciousNameCombination
         return z(y, x);
     }
 
     @Override
-    public SplitComplex timesY(double y) {
-        //noinspection SuspiciousNameCombination
+    public SplitComplex timesJ(double y) {
         return z(this.y * y, x * y);
     }
 
     @Override
-    public SplitComplex timesNegativeY() {
+    public SplitComplex timesNegativeJ() {
         return z(-y, -x);
     }
 
@@ -70,18 +69,18 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
     }
 
     @Override
-    public SplitComplex divY() {
-        return timesY();
+    public SplitComplex divJ() {
+        return timesJ();
     }
 
     @Override
-    public SplitComplex divY(double y) {
+    public SplitComplex divJ(double y) {
         return new SplitComplex(this.y / y, x / y);
     }
 
     @Override
-    public SplitComplex divNegativeY() {
-        return timesNegativeY();
+    public SplitComplex divNegativeJ() {
+        return timesNegativeJ();
     }
 
     @Override
@@ -118,7 +117,7 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
     // What is 'r' for a polar coordinates conversion in split-complex numbers?
     // Assume that x + jy has a polar decomposition as r exp(ja).  Then:
     //     x + jy = r exp(ja)
-    //     x + jy =  r [cosh a + j sinh a]
+    //     x + jy = r [cosh a + j sinh a]
     // 1 and j are orthogonal, so separating the real and imaginary components gives:
     //     x = r cosh a
     //     y = r sinh a
@@ -221,8 +220,6 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
             return ZERO;
         }
         double r = Math.exp(x);
-
-        //noinspection SuspiciousNameCombination
         return new SplitComplex(r * Math.cosh(y), r * Math.sinh(y));
     }
 
@@ -255,7 +252,7 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
      * with the same {@link Classification Classification}.  Points in other regions will be mapped consistently,
      * but not to {@code REGION_1}.  For example, if {@code region1dual()} is called on the value {@code 2 - j5},
      * that means it is in {@link Classification#REGION_IV REGION_IV}, where negative {@code y} values dominate.
-     * The returned function is then {@link SplitComplex#timesNegativeY()}, which reflects values over the line
+     * The returned function is then {@link SplitComplex#timesNegativeJ()}, which reflects values over the line
      * {@code y = -x}, swapping regions {@code I} and {@code IV}.  Calling it on the original value will resul
      * in {@code 5 - 2j} (the values are swapped and negated).  Repeating this operation restores the original
      * value, {@code 2 - j5}.
@@ -274,7 +271,7 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
         if (y > x) {
             if (y > -x) {
                 // REGION_II
-                return SplitComplex::timesY;
+                return SplitComplex::timesJ;
             }
             if (y < -x) {
                 // REGION_III
@@ -283,7 +280,7 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
         } else if (y < x) {
             if (y < -x) {
                 // REGION_IV
-                return SplitComplex::timesNegativeY;
+                return SplitComplex::timesNegativeJ;
             }
         }
 
@@ -394,7 +391,7 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
     /**
      * Identifies the broad categorization of the point provided.
      * <p>
-     * The hyperbolic plane is divided into for regions by the null vector axes y = x and y = -x
+     * The hyperbolic plane is divided into four regions by the null vector axes {@code y = x} and {@code y = -x}:
      * </p>
      * <pre>
      *    \  II   / (positive null vectors)
@@ -474,7 +471,6 @@ public class SplitComplex extends BinaryNumber<SplitComplex> {
          * In Region IV, {@code y < 0} and {@code |y| > |x|}, so negative {@code y} values dominate.
          */
         REGION_IV(splitComplex(0, -1));
-
 
         private final SplitComplex basis;
         private final boolean nullVector;

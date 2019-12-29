@@ -1,6 +1,7 @@
 package net.fwitz.math.binary.complex.analysis;
 
 import net.fwitz.math.binary.complex.Complex;
+import net.fwitz.math.binary.complex.functions.Factorial;
 
 import static java.lang.Math.PI;
 import static net.fwitz.math.binary.complex.Complex.ONE;
@@ -9,8 +10,11 @@ import static net.fwitz.math.binary.complex.Complex.ZERO;
 import static net.fwitz.math.binary.complex.Complex.complex;
 import static net.fwitz.math.binary.complex.Complex.real;
 import static net.fwitz.math.binary.complex.analysis.Gamma.gamma;
+import static net.fwitz.math.binary.complex.functions.Factorial.factorial;
 
 public class DirichletEta {
+    private static final int BORWEIN_D_TERMS = Factorial.MAX_INT_VALUE >> 1;
+    private static final double[] BORWEIN_D = calculateBorweinD(BORWEIN_D_TERMS);
     private static final int DEFAULT_TERMS = 16;
     private static final int DEFAULT_TERMS_BOOST_NEAR_1 = 84;
     private static final double MINUS_PI_OVER_2 = PI / -2;
@@ -41,7 +45,7 @@ public class DirichletEta {
             }
         }
 
-        if (s.x() > -4) {
+        if (s.x() > -2) {
             return eulerAcceleratedSum(s, terms);
         }
 
@@ -59,7 +63,7 @@ public class DirichletEta {
 
         for (int k = terms * terms; k > terms; --k) {
             Complex term = real(k).pow(minusS).times(innerSum);
-            outerSum = negate ? outerSum.minus(term) : outerSum.plus(term);
+            outerSum = outerSum.plusOrMinus(term, negate);
             coeff = coeff * nMinusJPlus1 / j;
             innerSum = innerSum.plus(coeff);
             --nMinusJPlus1;
@@ -70,7 +74,7 @@ public class DirichletEta {
         outerSum = outerSum.div(Math.pow(2, terms));
         for (int k = terms; k > 0; --k) {
             Complex term = real(k).pow(minusS);
-            outerSum = negate ? outerSum.minus(term) : outerSum.plus(term);
+            outerSum = outerSum.plusOrMinus(term, negate);
             negate = !negate;
         }
 
@@ -97,6 +101,37 @@ public class DirichletEta {
                 .times(sinTerm)
                 .times(gammaTerm)
                 .times(etaTerm);
+    }
+
+    private static Complex borweinsMethod(Complex s) {
+        double[] d = BORWEIN_D;
+        int n = d.length - 1;
+        double dn = d[n];
+        boolean negate = false;
+        Complex minusS = s.negative();
+        Complex sum = Complex.ZERO;
+        for (int k = 0; k < n - 1; ++k) {
+            Complex term = real(k + 1).pow(minusS).times(d[k] - dn);
+            sum = sum.plusOrMinus(term, negate);
+            negate = !negate;
+        }
+        return sum.div(-d[n]);
+    }
+
+    private static double[] calculateBorweinD(int n) {
+        double[] d = new double[n + 1];
+        for (int k = 0; k <= n; ++k) {
+            double sum = 0;
+            long fourToI = 1;
+            for (int i = 0; i <= k; ++i) {
+                double x1 = ((double)factorial(n + i - 1)) / factorial(n - i);
+                double x2 = ((double)fourToI) / factorial(2 * i);
+                sum += x1 * x2;
+                fourToI <<= 2;
+            }
+            d[k] = sum * n;
+        }
+        return d;
     }
 
     public static void main(String[] args) {

@@ -287,7 +287,7 @@ public class Erf {
                 /* don't use complex exp function, since that will produce spurious NaN
                    values when multiplying w in an overflow situation. */
                 Complex w = complex(cos(mz2im), sin(mz2im));
-                w = w.times(w(z.timesY(), relerr));
+                w = w.times(w(z.timesJ(), relerr));
                 w = w.times(exp(mz2re));
                 return w.negative().plus(1);
             }
@@ -307,7 +307,7 @@ public class Erf {
            values when multiplying w in an overflow situation. */
         return complex(cos(mz2im), sin(mz2im))
                 .times(exp(mz2re))
-                .times(w(z.timesNegativeY(), relerr))
+                .times(w(z.timesNegativeJ(), relerr))
                 .minus(1);
     }
 
@@ -354,7 +354,7 @@ public class Erf {
 
     // erfi(z) = -i erf(iz)
     public static Complex erfi(Complex z, double relerr) {
-        return erf(z.timesY(), relerr).timesNegativeY();
+        return erf(z.timesJ(), relerr).timesNegativeJ();
     }
 
     // erfi(x) = -i erf(ix)
@@ -415,11 +415,11 @@ public class Erf {
 
         if (x >= 0) {
             return complex(mz2re, mz2im).exp()
-                    .times(w(z.timesY(), relerr));
+                    .times(w(z.timesJ(), relerr));
         }
 
         return complex(mz2re, mz2im).exp()
-                .times(w(z.timesNegativeY(), relerr))
+                .times(w(z.timesNegativeJ(), relerr))
                 .negative().plus(2);
     }
 
@@ -467,7 +467,7 @@ public class Erf {
                 }
             }
             Complex res = mz2.exp().minus(w(z, relerr));
-            return res.timesY().times(SQRT_PI_OVER_2);
+            return res.timesJ().times(SQRT_PI_OVER_2);
         }
 
         // y < 0
@@ -484,7 +484,7 @@ public class Erf {
         }
 
         Complex res = w(z.negative(), relerr).minus(mz2.exp());
-        return res.timesY().times(SQRT_PI_OVER_2);
+        return res.timesJ().times(SQRT_PI_OVER_2);
     }
 
     // Use Taylor series for small |z|, to avoid cancellation inaccuracy
@@ -1345,7 +1345,7 @@ public class Erf {
     }
 
     public static Complex erfcx(Complex z, double relerr) {
-        return w(z.timesY(), relerr);
+        return w(z.timesJ(), relerr);
     }
 
     public static double erfcx(double value) {

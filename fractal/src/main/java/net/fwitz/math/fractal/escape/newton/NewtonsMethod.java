@@ -6,6 +6,7 @@ import net.fwitz.math.fractal.escape.EscapeFunction;
 import java.util.OptionalDouble;
 import java.util.function.Function;
 
+import static java.lang.Math.log;
 import static java.util.Objects.requireNonNull;
 import static net.fwitz.math.binary.complex.Complex.complex;
 import static net.fwitz.math.calculus.Derivation.derivative;
@@ -15,7 +16,8 @@ import static net.fwitz.math.fractal.escape.EscapeTimeResult.escaped;
 public class NewtonsMethod {
     private static final int DEFAULT_MAX_ITERS = 100;
     private static final double EPSILON = 1e-14;
-    private static final double TOLERANCE = 1e-7;
+    private static final double TOLERANCE = 1e-3;
+    private static final double LOG_TOLERANCE = log(TOLERANCE);
 
     public static EscapeFunction newtonsMethod(Function<Complex, Complex> f) {
         final Function<Complex, Complex> df = derivative(f);
@@ -40,6 +42,7 @@ public class NewtonsMethod {
 
         return c -> {
             Complex z = c;
+            double logDistPrev = Double.POSITIVE_INFINITY;
             for (int i = 1; i < maxIters; ++i) {
                 if (!Double.isFinite(z.x()) || !Double.isFinite(z.y())) {
                     return contained(z, OptionalDouble.empty());
@@ -54,9 +57,17 @@ public class NewtonsMethod {
                 Complex fz = f.apply(z);
                 Complex zPrev = z;
                 z = z.minus(fz.div(dfz));
-                if (z.minus(zPrev).abs() <= TOLERANCE * z.abs()) {
-                    return escaped(i, z, OptionalDouble.empty());
+
+                Complex delta = z.minus(zPrev);
+                double logDist = delta.logabs();
+
+                if (delta.abs() <= TOLERANCE) {
+                    double numer = TOLERANCE - logDistPrev;
+                    double denom = logDist - logDistPrev;
+                    return escaped(i, z, OptionalDouble.of(numer / denom));
                 }
+
+                logDistPrev = logDist;
             }
 
             return contained(z, OptionalDouble.empty());

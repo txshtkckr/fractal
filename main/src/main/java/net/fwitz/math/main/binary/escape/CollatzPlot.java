@@ -22,7 +22,7 @@ public class CollatzPlot {
             .build();
 
     public static void main(String[] args) {
-        EscapeTimePlot.complex("Mandelbrot (Escape time)")
+        EscapeTimePlot.complex("Collatz (Escape time)")
                 .computeFn(COLLATZ)
                 .domainX(P_MIN, P_MAX)
                 .domainY(Q_MIN, Q_MAX)

@@ -28,7 +28,7 @@ import static net.fwitz.math.binary.RealMath.rtanh;
  * An immutable complex number.
  * <p>
  * Note that since these values are immutable, a preference has been given to terminology like
- * {@link #plus(BinaryNumber) plus} or {@link #times(BinaryNumber) times} that connotes an result yielding
+ * {@link #plus(BinaryNumber) plus} or {@link #times(BinaryNumber) times} that connotes a result-yielding
  * operation as opposed to {@code add}, which might suggest that the operation is mutative and
  * and encourage mistakes.
  * </p>
@@ -139,10 +139,12 @@ public class Complex extends BinaryNumber<Complex> {
         } else if (re2 == 0.0) {
             return imaginary(-1.0 / y);
         } else {
-            // 1 / (a + bi)   [ multiply both top and bottom by the complex conjugate, (a - bi) ]
-            // (a - bi) / (a^2 + b^2)
-            double scale = re2 + im2;
-            return new Complex(x / scale, -y / scale);
+            // 1 / (a + bi)            [ multiply both top and bottom by the complex conjugate, (a - bi) ]
+            // (a - bi) / (a^2 + b^2)  [ substitute u = a^2 + b^2 ]
+            // (a - bi) / u            [ distribute ]
+            // (a/u) + (-b/u)i
+            double u = re2 + im2;
+            return new Complex(x / u, -y / u);
         }
     }
 
@@ -169,25 +171,25 @@ public class Complex extends BinaryNumber<Complex> {
     //----------------------------------------------------------------
 
     @Override
-    public Complex timesY() {
+    public Complex timesJ() {
         //noinspection SuspiciousNameCombination
         return new Complex(-y, x);
     }
 
     @Override
-    public Complex timesY(double y) {
+    public Complex timesJ(double y) {
         return new Complex(-this.y * y, x * y);
     }
 
     @Override
-    public Complex timesNegativeY() {
+    public Complex timesNegativeJ() {
         //noinspection SuspiciousNameCombination
         return new Complex(y, -x);
     }
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * This method uses the well-known and straight-forward approach of First Outside Inside Last distribution
      * of terms, then simplifying:
      * <ul>
@@ -203,6 +205,7 @@ public class Complex extends BinaryNumber<Complex> {
             return times(c.x());
         }
         if (y == 0) {
+            //noinspection unchecked
             return c.times(x);
         }
         return times(this, c);
@@ -277,30 +280,29 @@ public class Complex extends BinaryNumber<Complex> {
     }
 
 
-
     /**
      * Returns the result of dividing this complex value by the imaginary value {@code i}.
      * Note that diving by {@code i} is mathematically exactly equivalent to
-     * {@link #timesNegativeY() multiplying by -i}.
+     * {@link #timesNegativeJ() multiplying by -i}.
      */
     @Override
-    public Complex divY() {
-        return timesNegativeY();
+    public Complex divJ() {
+        return timesNegativeJ();
     }
 
     @Override
-    public Complex divY(double y) {
+    public Complex divJ(double y) {
         return z(this.y / y, -x / y);
     }
 
     /**
      * Returns the result of dividing this complex value by the imaginary value {@code i}.
      * Note that diving by {@code -i} is mathematically exactly equivalent to
-     * {@link #timesY() multiplying by i}.
+     * {@link #timesJ() multiplying by i}.
      */
     @Override
-    public Complex divNegativeY() {
-        return timesY();
+    public Complex divNegativeJ() {
+        return timesJ();
     }
 
     /**
@@ -400,7 +402,7 @@ public class Complex extends BinaryNumber<Complex> {
     //     log(b) + log(sqrt(u^2 + 1))     [ log(xy) = log(x) + log(y) ]
     //     log(b) + log((u^2 + 1) ^ 0.5)   [ sqrt(x) = x^0.5 ]
     //     log(b) + 0.5 * log(u^2 + 1)     [ log(x^y) = y * log(x) ]
-    //     log(b) + 0.5 * logp1(u^2)       [ logp1(x) = log(1 + x) ]
+    //     log(b) + 0.5 * log1p(u^2)       [ logp1(x) = log(1 + x) ]
     // log1p yields its best results when values are small, so assign the smaller value to a to ensure that
     // u = a/b <= 1.
 
@@ -430,7 +432,7 @@ public class Complex extends BinaryNumber<Complex> {
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * All of the logarithmic functions provided here have a branch cut along the negative real axis.
      */
     @Override
@@ -478,16 +480,25 @@ public class Complex extends BinaryNumber<Complex> {
         return polar(r, theta);
     }
 
+    /**
+     * Returns the base 10 exponential of this complex number, {@code 10^z}.
+     */
+    public Complex exp10() {
+        double r = rexp(LN_10 * x);
+        double theta = LN_10 * y;
+        return polar(r, theta);
+    }
 
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * This function has a branch cut for {@code z} (this complex number) along the negative real axis.
      */
     @Override
     public Complex pow(double x) {
         if (x == 0.0) {
+            // This incorrectly returns 1 for 0^0, but so does Math.pow, so...
             return ONE;
         }
         if (x == 1.0) {
@@ -889,7 +900,6 @@ public class Complex extends BinaryNumber<Complex> {
     }
 
 
-
     //================================================================
     // Inverse Hyperbolic
     //----------------------------------------------------------------
@@ -903,7 +913,7 @@ public class Complex extends BinaryNumber<Complex> {
      * This function has a branch cut on the imaginary axis outside the range {@code [-i, i]}.
      */
     public Complex asinh() {
-        return timesY().asin().timesNegativeY();
+        return timesJ().asin().timesNegativeJ();
     }
 
     /**
@@ -915,7 +925,7 @@ public class Complex extends BinaryNumber<Complex> {
             return acosh(x);
         }
         Complex z = acos();
-        return (z.y > 0) ? z.timesNegativeY() : z.timesY();
+        return (z.y > 0) ? z.timesNegativeJ() : z.timesJ();
     }
 
     /**
@@ -938,7 +948,7 @@ public class Complex extends BinaryNumber<Complex> {
      * This function has a branch cut on the real axis outside the range {@code [-1, 1]}.
      */
     public Complex atanh() {
-        return timesY().atan().timesNegativeY();
+        return timesJ().atan().timesNegativeJ();
     }
 
     /**
@@ -1068,7 +1078,7 @@ public class Complex extends BinaryNumber<Complex> {
 
     // compute erfcx(z) = exp(z^2) erfz(z)
     private static Complex erfcx(Complex z, double relerr) {
-        return w(z.timesY(), relerr);
+        return w(z.timesJ(), relerr);
     }
 
     private static Complex w(Complex z, double relerr) {

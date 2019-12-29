@@ -72,7 +72,7 @@ public class DomainColoringSplit implements SplitComplexColorFunction {
 
     private static float f(double x) {
         final float f = (float) x;
-        return (f < 0.0f) ? 0.0f : ((f > 1.0f) ? 1.0f : f);
+        return (f < 0.0f) ? 0.0f : Math.min(f, 1.0f);
     }
 
     public static void main(String[] args) {

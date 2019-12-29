@@ -8,7 +8,7 @@ import java.util.function.Function;
 import static java.lang.Double.doubleToLongBits;
 
 /**
- * A binary number has two components with some relationship defines as to how they interact under elementary
+ * A binary number has two components with some relationship that defines how they interact under elementary
  * operations.  These take the form {@code x + jy}, where the two components are linearly independent under
  * addition, but where multiplicative operations produce {@code j^2} terms that behave in some special way.
  * For example:
@@ -116,8 +116,8 @@ public abstract class BinaryNumber<T extends BinaryNumber<T>> implements Seriali
     }
 
     /**
-     * Returns {@code true} if {@link #isNaN()} is {@code false} either {@link #x()} or {@link #y()} is
-     * {@link Double#isInfinite(double) infinite}.
+     * Returns {@code true} if {@link #isNaN()} is {@code false} and <strong>either</strong> {@link #x()} or
+     * {@link #y()} is {@link Double#isInfinite(double) infinite}.
      */
     public final boolean isInfinite() {
         if (Double.isInfinite(x())) {
@@ -154,7 +154,7 @@ public abstract class BinaryNumber<T extends BinaryNumber<T>> implements Seriali
     }
 
     //================================================================
-    // Additional and subtraction
+    // Addition and subtraction
     //----------------------------------------------------------------
 
     /**
@@ -162,6 +162,15 @@ public abstract class BinaryNumber<T extends BinaryNumber<T>> implements Seriali
      */
     public final T plus(double x) {
         return z(x() + x, y());
+    }
+
+    /**
+     * Return the result of adding or subtracting the "real" value {@code x} to/from this binary number.
+     * This is meant to be useful for alternating series, where a <code>-1<sup>k</sup></code> term can
+     * more efficiently be expressed with a flipping {@code boolean}.
+     */
+    public final T plusOrMinus(double x, boolean negate) {
+        return negate ? minus(x) : plus(x);
     }
 
     /**
@@ -176,6 +185,15 @@ public abstract class BinaryNumber<T extends BinaryNumber<T>> implements Seriali
      */
     public final T plus(BinaryNumber<? extends T> c) {
         return z(x() + c.x(), y() + c.y());
+    }
+
+    /**
+     * Return the result of adding or subtracting the complex value {@code c} to/from this binary number.
+     * This is meant to be useful for alternating series, where a <code>-1<sup>k</sup></code> term can
+     * more efficiently be expressed with a flipping {@code boolean}.
+     */
+    public final T plusOrMinus(BinaryNumber<? extends T> c, boolean negate) {
+        return negate ? minus(c) : plus(c);
     }
 
     /**
@@ -213,17 +231,17 @@ public abstract class BinaryNumber<T extends BinaryNumber<T>> implements Seriali
     /**
      * Returns the result of multiplying this binary number by the "imaginary" value {@code j}.
      */
-    public abstract T timesY();
+    public abstract T timesJ();
 
     /**
      * Returns the result of multiplying this binary number by the "imaginary" value {@code jy}.
      */
-    public abstract T timesY(double y);
+    public abstract T timesJ(double y);
 
     /**
      * Returns the result of multiplying this binary number by the "imaginary" value {@code -j}.
      */
-    public abstract T timesNegativeY();
+    public abstract T timesNegativeJ();
 
 
     /**
@@ -242,17 +260,17 @@ public abstract class BinaryNumber<T extends BinaryNumber<T>> implements Seriali
     /**
      * Returns the result of dividing this binary number by the "imaginary" value {@code j}.
      */
-    public abstract T divY();
+    public abstract T divJ();
 
     /**
      * Returns the result of dividing this binary number by the "imaginary" value {@code jy}.
      */
-    public abstract T divY(double y);
+    public abstract T divJ(double y);
 
     /**
      * Returns the result of dividing this binary number by the "imaginary" value {@code -j}.
      */
-    public abstract T divNegativeY();
+    public abstract T divNegativeJ();
 
     /**
      * Returns the result of dividing this binary number by the binary number {@code c}.

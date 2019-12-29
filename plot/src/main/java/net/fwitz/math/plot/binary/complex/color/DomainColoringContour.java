@@ -6,10 +6,10 @@ import java.awt.*;
 
 import static java.awt.Color.getHSBColor;
 import static java.lang.Math.floor;
-import static java.lang.Math.log;
 
 public class DomainColoringContour implements ComplexColorFunction {
     private static final double TWO_PI = Math.PI * 2.0;
+    private static final double LN_2_RECIP = 1.0 / Math.log(2.0);
 
     private static float hue(Complex z) {
         double hue = z.arg() / TWO_PI;
@@ -17,12 +17,13 @@ public class DomainColoringContour implements ComplexColorFunction {
     }
 
     private static double logScaleMantissa(Complex z) {
-        double m = log(z.abs());
+        double m = z.logabs() * LN_2_RECIP;
         return m - floor(m);
     }
 
     private static float brightness(double k) {
-        return (float) (0.4 + 0.6 * k);
+        //return (float) (0.4 + 0.6 * k);
+        return (float) Math.pow(k, 0.2);
     }
 
 
