@@ -34,7 +34,7 @@ object DomainColoringSmooth : ComplexColorFunction {
         val arg: Double = z.arg
         val k = logScale(z)
         val hue = hue(arg)
-        val `val` = brightness(hue, k)
-        return Color.getHSBColor(hue, 1.0f, `val`)
+        val brt = brightness(hue, k)
+        return Color.getHSBColor(hue, 1.0f, brt)
     }
 }

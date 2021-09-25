@@ -45,18 +45,10 @@ abstract class BinaryNumberFunctionPlot<
         return self
     }
 
-    fun width(): Int {
-        return width
-    }
-
     fun height(height: Int): L {
         require(!(height < 100 || height > 16384)) { "height: $height" }
         this.height = height
         return self
-    }
-
-    fun height(): Int {
-        return height
     }
 
     fun size(width: Int, height: Int): L {
@@ -100,7 +92,7 @@ abstract class BinaryNumberFunctionPlot<
 
     fun render() {
         val frame = JFrame(title)
-        frame.setSize(width(), height())
+        frame.setSize(width, height)
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
         val panel = createPanel()
         frame.setContentPane(panel)

@@ -1,12 +1,16 @@
 package net.fwitz.math.plot.renderer
 
-import java.util.stream.IntStream
 import java.awt.Color
-import java.awt.image.BufferedImage
 import java.awt.Graphics
+import java.awt.image.BufferedImage
 import java.awt.image.ImageObserver
+import java.util.stream.IntStream
 
-abstract class ImageRenderer(protected val width: Int, protected val height: Int) {
+abstract class ImageRenderer(
+    val width: Int,
+    val height: Int,
+    val background: Color = Color.DARK_GRAY
+) {
     companion object {
         fun partition(buckets: Int, valueMin: Double, valueMax: Double): DoubleArray {
             val valueDomain = valueMax - valueMin
@@ -16,14 +20,9 @@ abstract class ImageRenderer(protected val width: Int, protected val height: Int
         }
     }
 
-    protected val image: BufferedImage
-    protected val pipeline: RenderingPipeline
-
-    fun width() = width
-    fun height() = height
-
-    val isWorking: Boolean
-        get() = pipeline.isWorking
+    val image = BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
+    val pipeline = RenderingPipeline.create()
+    val isWorking get() = pipeline.isWorking
 
     abstract fun render()
 
@@ -38,15 +37,10 @@ abstract class ImageRenderer(protected val width: Int, protected val height: Int
     }
 
     fun paint(g: Graphics, observer: ImageObserver?) {
-        g.drawImage(image, 0, 0, Color.DARK_GRAY, observer)
+        g.drawImage(image, 0, 0, background, observer)
     }
 
     override fun toString(): String {
         return "ImageRenderer[" + width + 'x' + height + ']'
-    }
-
-    init {
-        image = BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
-        pipeline = RenderingPipeline.create()
     }
 }

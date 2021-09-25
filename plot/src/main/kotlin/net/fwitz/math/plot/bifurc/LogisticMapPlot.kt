@@ -51,15 +51,12 @@ class LogisticMapPlot(private val title: String) {
         this.width = width
     }
 
-    fun width() = width
-
     fun height(height: Int): LogisticMapPlot {
         require(!(height < 100 || height > 16384)) { "height: $height" }
         this.height = height
         return this
     }
 
-    fun height() = height
     fun size(width: Int, height: Int) = width(width).height(height)
 
     fun computeFn(computeFn: (Double) -> DoubleArray?): LogisticMapPlot {
@@ -78,7 +75,7 @@ class LogisticMapPlot(private val title: String) {
 
     fun render() {
         val frame = JFrame(title)
-        frame.setSize(width(), height())
+        frame.setSize(width, height)
         frame.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
         val panel = createPanel()
         frame.contentPane = panel
@@ -89,5 +86,4 @@ class LogisticMapPlot(private val title: String) {
     protected fun createPanel(): LogisticMapPanel {
         return LogisticMapPanel(minr, minxn, maxr, maxxn, computeFn!!)
     }
-
 }

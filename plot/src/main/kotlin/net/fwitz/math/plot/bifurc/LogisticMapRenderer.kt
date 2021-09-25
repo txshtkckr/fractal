@@ -22,17 +22,13 @@ class LogisticMapRenderer(
 
     override fun render() {
         pipeline.flush()
-        Arrays.stream(Randomizer.shuffledInts(width))
-            .mapToObj { x: Int -> colRenderer(x) }
-            .forEach { runnable: Runnable -> pipeline.execute(runnable) }
+        Randomizer.shuffledInts(width).forEach { x ->
+            pipeline.execute { colRenderer(x) }
+        }
     }
 
-    private fun colRenderer(x: Int): Runnable {
-        return Runnable {
-            if (!pipeline.isShutdown) {
-                calculateColWithExceptionsHandled(x)
-            }
-        }
+    private fun colRenderer(x: Int) {
+        if (!pipeline.isShutdown) calculateColWithExceptionsHandled(x)
     }
 
     private fun calculateColWithExceptionsHandled(x: Int) {
@@ -61,8 +57,8 @@ class LogisticMapRenderer(
         image.setRGB(x, 0, 1, height, blackColumn, 0, 0)
         if (values.isEmpty()) return
 
-        val `val` = 1.0f / values.size
-        val color = Color(1 - `val`, `val`, `val` / 2).rgb
+        val value = 1.0f / values.size
+        val color = Color(1 - value, value, value / 2).rgb
         DoubleStream.of(*values)
             .mapToInt { xn: Double -> height - ((xn - minxn) * xnScale).roundToInt() }
             .filter { y: Int -> y in 0 until height }

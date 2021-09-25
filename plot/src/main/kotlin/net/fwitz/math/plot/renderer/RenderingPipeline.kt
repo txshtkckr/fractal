@@ -10,7 +10,6 @@ import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.RejectedExecutionException
 import kotlin.jvm.Synchronized
-import java.lang.InterruptedException
 
 class RenderingPipeline private constructor() {
     companion object {
@@ -41,12 +40,12 @@ class RenderingPipeline private constructor() {
         TimeUnit.SECONDS, queue, threadFactory
     )
 
-    fun execute(runnable: Runnable) {
+    fun execute(block: () -> Unit) {
         try {
             taskSubmitted()
             executor.execute {
                 try {
-                    runnable.run()
+                    block()
                 } finally {
                     taskFinished()
                 }

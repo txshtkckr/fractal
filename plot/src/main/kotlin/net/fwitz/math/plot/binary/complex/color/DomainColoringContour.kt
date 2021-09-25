@@ -28,7 +28,7 @@ object DomainColoringContour : ComplexColorFunction {
     override fun invoke(c: Complex, z: Complex): Color {
         val k = logScaleMantissa(z)
         val hue = hue(z)
-        val `val` = brightness(k)
-        return Color.getHSBColor(hue, 1.0f, `val`)
+        val brt = brightness(k)
+        return Color.getHSBColor(hue, 1.0f, brt)
     }
 }

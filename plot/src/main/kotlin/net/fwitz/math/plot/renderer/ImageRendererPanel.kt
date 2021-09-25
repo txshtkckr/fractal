@@ -25,7 +25,6 @@ abstract class ImageRendererPanel<R : ImageRenderer?> protected constructor() : 
         return super.imageUpdate(img, infoflags, x, y, w, h) || incomplete
     }
 
-    // Oops... lost the race, so make sure this renderer gets shutdown properly before we abandon it
     val renderer: R?
         get() {
             while (true) {
@@ -34,7 +33,7 @@ abstract class ImageRendererPanel<R : ImageRenderer?> protected constructor() : 
                 if (width == 0 || height == 0) return null
 
                 var renderer = rendererRef.get()
-                if (renderer != null && renderer.width() == width && renderer.height() == height && !renderer.cancelled()) {
+                if (renderer != null && renderer.width == width && renderer.height == height && !renderer.cancelled()) {
                     return renderer
                 }
 

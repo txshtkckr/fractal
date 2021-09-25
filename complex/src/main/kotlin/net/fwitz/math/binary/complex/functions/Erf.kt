@@ -271,7 +271,7 @@ object Erf {
             if (abs(mz2im) < 0.005 && x > -0.005) {
                 return erfiTaylor(x, y)
             }
-        } else if (java.lang.Double.isNaN(x)) {
+        } else if (x.isNaN()) {
             // .cc source checks y == 0 here, but that was already ruled out at the top of the method
             return Complex.NaN
         }
@@ -617,8 +617,8 @@ object Erf {
                             val yax = ya / xs
                             val denom = ONE_OVER_SQRT_PI / (xs + yax * ya)
                             Complex(denom * yax, denom)
-                        } else if (java.lang.Double.isInfinite(ya)) {
-                            return if (java.lang.Double.isNaN(x) || y < 0) Complex.NaN else Complex.ZERO
+                        } else if (ya.isInfinite()) {
+                            return if (x.isNaN() || y < 0) Complex.NaN else Complex.ZERO
                         } else {
                             val xya = xs / ya
                             val denom = ONE_OVER_SQRT_PI / (xya * xs + ya)
@@ -689,9 +689,7 @@ object Erf {
      sometimes run into numerical problems because underflow/overflow
      problems start to appear in the various coefficients of the sums,
      below.  Therefore, we use x < 10 here. */if (x < 10) {
-            if (java.lang.Double.isNaN(y)) {
-                return Complex.NaN
-            }
+            if (y.isNaN()) return Complex.NaN
             var prod2ax = 1.0
             var prodm2ax = 1.0
             val expx2: Double
@@ -812,9 +810,7 @@ object Erf {
                 )
             }
         } else { // x large: only sum3 & sum5 contribute (see above note)
-            if (java.lang.Double.isNaN(x) || java.lang.Double.isNaN(y)) {
-                return Complex.NaN
-            }
+            if (x.isNaN() || y.isNaN()) return Complex.NaN
             ret = if (USE_CONTINUED_FRACTION) {
                 real(exp(-x * x))
             } else {

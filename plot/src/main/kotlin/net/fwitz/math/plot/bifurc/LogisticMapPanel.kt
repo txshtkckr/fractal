@@ -20,7 +20,7 @@ class LogisticMapPanel(
 ) : ImageRendererPanel<LogisticMapRenderer>() {
     companion object {
         private fun valid(vararg values: Double): Boolean {
-            return DoubleStream.of(*values).allMatch { d: Double -> java.lang.Double.isFinite(d) }
+            return DoubleStream.of(*values).allMatch { d: Double -> d.isFinite() }
         }
     }
 
@@ -105,10 +105,7 @@ class LogisticMapPanel(
         }
     }
 
-    // Glue code to make AbstractAction suck less by looking like a functional interface
-    val mouseLocationInMap: Point2D.Double? get() = getMouseLocationInMap(null)
-
-    fun getMouseLocationInMap(e: MouseEvent?): Point2D.Double? {
+    fun getMouseLocationInMap(e: MouseEvent): Point2D.Double? {
         val loc = getMouseLocationAsRelativePoint(e) ?: return null
         return Point2D.Double(
             scaleToBounds(loc.getX(), minr, maxr),

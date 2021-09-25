@@ -11,9 +11,7 @@ interface EscapeFunction<T : BinaryNumber<T>> : (T) -> EscapeTimeResult<T> {
         /**
          * @return a builder for creating an escape time function that behaves in a fairly standard way
          */
-        fun <T : BinaryNumber<T>> builder(): Builder<T> {
-            return DefaultEscapeFunction.builder()
-        }
+        fun <T : BinaryNumber<T>> builder(): Builder<T> = DefaultEscapeFunction.builder()
     }
 
     /**
@@ -130,9 +128,7 @@ interface EscapeFunction<T : BinaryNumber<T>> : (T) -> EscapeTimeResult<T> {
          * [Enable convergence smoothing][.enableConvergenceSmoothing] using the default adjustment
          * factor of `1.0`.
          */
-        fun enableConvergenceSmoothing(): Builder<T> {
-            return enableConvergenceSmoothing(1.0)
-        }
+        fun enableConvergenceSmoothing(): Builder<T> = enableConvergenceSmoothing(1.0)
 
         /**
          * Enables smoothed magnitude tracking for convergent values so that this information will be included in the
@@ -146,9 +142,7 @@ interface EscapeFunction<T : BinaryNumber<T>> : (T) -> EscapeTimeResult<T> {
          * [Enable divergence smoothing][.enableDivergenceSmoothing] using the default adjustment
          * factor of `1.0`.
          */
-        fun enableDivergenceSmoothing(): Builder<T> {
-            return enableDivergenceSmoothing(1.0)
-        }
+        fun enableDivergenceSmoothing() = enableDivergenceSmoothing(1.0)
 
         /**
          * Enables smoothed magnitude tracking for divergent values so that this information will be included in the

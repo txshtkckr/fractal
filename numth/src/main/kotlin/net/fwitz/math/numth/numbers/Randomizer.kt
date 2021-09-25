@@ -1,11 +1,12 @@
 package net.fwitz.math.numth.numbers
 
+import java.awt.Color
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.IntStream
 
 object Randomizer {
-    private val RANDOM get() = ThreadLocalRandom.current()
+    val RANDOM get() = ThreadLocalRandom.current()
 
     /**
      * Creates a set of random integers with the given [cardinality][BitSet.cardinality] and
@@ -75,6 +76,9 @@ object Randomizer {
         }
         return result
     }
+
+    fun randomColor() = Color(RANDOM.nextInt(256), RANDOM.nextInt(256), RANDOM.nextInt(256))
+    fun randomRGB() = randomColor().rgb
 
     fun shuffledInts(size: Int, random: Random = RANDOM): IntArray {
         val values = IntStream.range(0, size).toArray()

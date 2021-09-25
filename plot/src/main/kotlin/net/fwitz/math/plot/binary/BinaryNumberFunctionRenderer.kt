@@ -29,12 +29,12 @@ abstract class BinaryNumberFunctionRenderer<T : BinaryNumber<T>, V>(
 
     override fun render() {
         pipeline.flush()
-        Arrays.stream(Randomizer.shuffledInts(height))
-            .mapToObj { y: Int -> rowRenderer(y) }
-            .forEach { runnable: Runnable -> pipeline.execute(runnable) }
+        Randomizer.shuffledInts(height).forEach { y ->
+            pipeline.execute { rowRenderer(y) }
+        }
     }
 
-    private fun rowRenderer(y: Int) = Runnable {
+    private fun rowRenderer(y: Int) {
         if (!pipeline.isShutdown) calculateRowWithExceptionsHandled(y)
     }
 
