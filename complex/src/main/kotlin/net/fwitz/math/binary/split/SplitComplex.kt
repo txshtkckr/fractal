@@ -1,17 +1,17 @@
 package net.fwitz.math.binary.split
 
 import net.fwitz.math.binary.BinaryNumber
-import net.fwitz.math.binary.RealMath.ratanh
-import net.fwitz.math.binary.RealMath.rcos
-import net.fwitz.math.binary.RealMath.rcosh
-import net.fwitz.math.binary.RealMath.rexp
-import net.fwitz.math.binary.RealMath.rsin
-import net.fwitz.math.binary.RealMath.rsinh
-import net.fwitz.math.binary.RealMath.rsqrt
 import net.fwitz.math.binary.complex.Complex
 import net.fwitz.math.binary.split.SplitComplex.Classification.NAN
 import java.util.function.Function
 import kotlin.math.*
+import kotlin.math.atanh as ratanh
+import kotlin.math.cos as rcos
+import kotlin.math.cosh as rcosh
+import kotlin.math.exp as rexp
+import kotlin.math.sin as rsin
+import kotlin.math.sinh as rsinh
+import kotlin.math.sqrt as rsqrt
 
 @Suppress("MemberVisibilityCanBePrivate")
 class SplitComplex(x: Double, y: Double) : BinaryNumber<SplitComplex>(x, y) {
@@ -187,7 +187,7 @@ class SplitComplex(x: Double, y: Double) : BinaryNumber<SplitComplex>(x, y) {
         get() = when {
             // Ensure we don't end up with -0.0 for either part
             x == 0.0 && !y.isNaN() -> ZERO
-            else -> rexp(x).let { r -> SplitComplex(r * cosh(y), r * sinh(y)) }
+            else -> rexp(x).let { r -> SplitComplex(r * rcosh(y), r * rsinh(y)) }
         }
 
     override fun pow(a: Double) = when {

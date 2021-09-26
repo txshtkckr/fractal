@@ -1,23 +1,20 @@
 package net.fwitz.math.binary.complex
 
-import net.fwitz.math.binary.complex.functions.Erf
 import net.fwitz.math.binary.BinaryNumber
-import net.fwitz.math.binary.RealMath.racos
-import net.fwitz.math.binary.RealMath.racosh
-import net.fwitz.math.binary.RealMath.rasin
-import net.fwitz.math.binary.RealMath.ratan
-import net.fwitz.math.binary.RealMath.rcos
-import net.fwitz.math.binary.RealMath.rcosh
-import net.fwitz.math.binary.RealMath.rexp
-import net.fwitz.math.binary.RealMath.rhypot
-import net.fwitz.math.binary.RealMath.rlog
-import net.fwitz.math.binary.RealMath.rlog1p
-import net.fwitz.math.binary.RealMath.rsin
-import net.fwitz.math.binary.RealMath.rsinh
-import net.fwitz.math.binary.RealMath.rsqrt
-import net.fwitz.math.binary.RealMath.rtanh
-import java.util.stream.IntStream
+import net.fwitz.math.binary.complex.functions.Erf
 import kotlin.math.*
+import kotlin.math.acos as racos
+import kotlin.math.acosh as racosh
+import kotlin.math.asin as rasin
+import kotlin.math.atan as ratan
+import kotlin.math.cos as rcos
+import kotlin.math.cosh as rcosh
+import kotlin.math.exp as rexp
+import kotlin.math.hypot as rhypot
+import kotlin.math.sin as rsin
+import kotlin.math.sinh as rsinh
+import kotlin.math.sqrt as rsqrt
+import kotlin.math.tanh as rtanh
 
 /**
  * An immutable complex number.
@@ -111,9 +108,8 @@ class Complex(x: Double, y: Double) : BinaryNumber<Complex>(x, y) {
 
         private fun div(z: Complex, w: BinaryNumber<out Complex>): Complex {
             val absIm = w.y.absoluteValue
-            if (absIm == 0.0) {
-                return z.div(w.x)
-            }
+            if (absIm == 0.0) return z.div(w.x)
+
             var a = z.x
             var b = z.y
             var c = w.x
@@ -122,6 +118,7 @@ class Complex(x: Double, y: Double) : BinaryNumber<Complex>(x, y) {
             var y: Double
             val u: Double
             val denom: Double
+
             val absRe = c.absoluteValue
             if (absRe < absIm) {
                 u = c / d
@@ -169,7 +166,7 @@ class Complex(x: Double, y: Double) : BinaryNumber<Complex>(x, y) {
          * @return the angle normalized to `[0, 2*PI)`, corresponding to a branch cut along the positive real axis
          */
         private fun positiveRealBranchCut(theta: Double): Double {
-            val th = atan2(sin(theta), cos(theta))
+            val th = atan2(rsin(theta), rcos(theta))
             return if (th < 0.0) th + TWO_PI else th
         }
 
@@ -312,7 +309,7 @@ class Complex(x: Double, y: Double) : BinaryNumber<Complex>(x, y) {
      *  * Otherwise, the result is the square root of the sum of the squares of the two components.
      *
      */
-    override val abs get() = hypot(x, y)
+    override val abs get() = rhypot(x, y)
 
     /**
      * Returns the argument of this complex number, `arg(z)`, with a range of `[-PI, PI]`.
@@ -335,17 +332,17 @@ class Complex(x: Double, y: Double) : BinaryNumber<Complex>(x, y) {
             val im2 = y * y
             // Prevent real numbers from using -0.0 as the imaginary portion of the inverse, but
             // if both parts were +/-0, then make sure that they both end up NaN.
-            return if (im2 == 0.0) {
-                if (re2 == 0.0) NaN else real(1.0 / x)
-            } else if (re2 == 0.0) {
-                imaginary(-1.0 / y)
-            } else {
-                // 1 / (a + bi)            [ multiply both top and bottom by the complex conjugate, (a - bi) ]
-                // (a - bi) / (a^2 + b^2)  [ substitute u = a^2 + b^2 ]
-                // (a - bi) / u            [ distribute ]
-                // (a/u) + (-b/u)i
-                val u = re2 + im2
-                Complex(x / u, -y / u)
+            return when {
+                im2 == 0.0 -> if (re2 == 0.0) NaN else real(1.0 / x)
+                re2 == 0.0 -> imaginary(-1.0 / y)
+                else -> {
+                    // 1 / (a + bi)            [ multiply both top and bottom by the complex conjugate, (a - bi) ]
+                    // (a - bi) / (a^2 + b^2)  [ substitute u = a^2 + b^2 ]
+                    // (a - bi) / u            [ distribute ]
+                    // (a/u) + (-b/u)i
+                    val u = re2 + im2
+                    Complex(x / u, -y / u)
+                }
             }.also { inverseCached = it }
         }
 
@@ -372,7 +369,6 @@ class Complex(x: Double, y: Double) : BinaryNumber<Complex>(x, y) {
 
     /**
      * {@inheritDoc}
-     *
      *
      * This method uses the well-known and straight-forward approach of First Outside Inside Last distribution
      * of terms, then simplifying:
@@ -436,7 +432,7 @@ class Complex(x: Double, y: Double) : BinaryNumber<Complex>(x, y) {
     // Logarithmic
     //----------------------------------------------------------------
     // The naive approach is to return
-    //     rlog(sqrt(x * x + y + y))
+    //     ln(sqrt(x * x + y + y))
     // but this risks an excessive loss of precision for small values.  To prevent this, we rewrite the expression
     // with a substitution of variables.  First, as signs and which component is which do not matter, let's assume
     // that neither value is 0 and name their absolute values a and b, without worrying just yet about which is which.
@@ -679,28 +675,27 @@ class Complex(x: Double, y: Double) : BinaryNumber<Complex>(x, y) {
             val a = 0.5 * (r + s)
             val b = x / a // 0.5 * (r - s), avoiding risk of cancellation error
             val y2 = y * y
-            val zRe: Double
-            zRe = if (b <= B_CROSSOVER) {
-                rasin(b)
-            } else if (x <= 1) {
-                val scale = 0.5 * (a + x) * (y2 / (r + (x + 1.0)) + (s + (1.0 - x)))
-                ratan(x / rsqrt(scale))
-            } else {
-                val apx = a + x
-                val scale = 0.5 * (apx / (r + (x + 1.0)) + apx / (s + (x - 1.0)))
-                ratan(x / (y * rsqrt(scale)))
-            }
-            val zIm: Double
-            if (a <= A_CROSSOVER) {
-                val am1: Double
-                am1 = if (x < 1) {
-                    0.5 * (y2 / (r + (x + 1.0)) + y2 / (s + (1.0 - x)))
-                } else {
-                    0.5 * (y2 / (r + (x + 1.0)) + (s + (x - 1.0)))
+            val zRe = when {
+                b <= B_CROSSOVER -> rasin(b)
+                x <= 1 -> {
+                    val scale = 0.5 * (a + x) * (y2 / (r + (x + 1.0)) + (s + (1.0 - x)))
+                    ratan(x / rsqrt(scale))
                 }
-                zIm = rlog1p(am1 + rsqrt(am1 * (a + 1.0)))
-            } else {
-                zIm = rlog(a + rsqrt(a * a - 1.0))
+                else -> {
+                    val apx = a + x
+                    val scale = 0.5 * (apx / (r + (x + 1.0)) + apx / (s + (x - 1.0)))
+                    ratan(x / (y * rsqrt(scale)))
+                }
+            }
+            val zIm = when {
+                a <= A_CROSSOVER -> {
+                    val am1 = when {
+                        x < 1 -> 0.5 * (y2 / (r + (x + 1.0)) + y2 / (s + (1.0 - x)))
+                        else -> 0.5 * (y2 / (r + (x + 1.0)) + (s + (x - 1.0)))
+                    }
+                    ln1p(am1 + rsqrt(am1 * (a + 1.0)))
+                }
+                else -> ln(a + rsqrt(a * a - 1.0))
             }
             return Complex(zRe.withSign(this.x), zIm.withSign(this.y))
         }
@@ -730,17 +725,15 @@ class Complex(x: Double, y: Double) : BinaryNumber<Complex>(x, y) {
                 val scale = 0.5 * (apx / (r + x + 1.0) + apx / (s + (x - 1.0)))
                 ratan(y * rsqrt(scale) / x)
             }
-            val zIm: Double
-            if (a <= A_CROSSOVER) {
-                val am1: Double
-                am1 = if (x < 1) {
-                    0.5 * (y2 / (r + (x + 1.0)) + y2 / (s + (1.0 - x)))
-                } else {
-                    0.5 * (y2 / (r + (x + 1.0)) + (s + (x - 1.0)))
+            val zIm = when {
+                a <= A_CROSSOVER -> {
+                    val am1 = when {
+                        x < 1 -> 0.5 * (y2 / (r + (x + 1.0)) + y2 / (s + (1.0 - x)))
+                        else -> 0.5 * (y2 / (r + (x + 1.0)) + (s + (x - 1.0)))
+                    }
+                    ln1p(am1 + rsqrt(am1 * (a + 1.0)))
                 }
-                zIm = rlog1p(am1 + rsqrt(am1 * (a + 1.0)))
-            } else {
-                zIm = ln(a + rsqrt(a * a - 1.0))
+                else -> ln(a + rsqrt(a * a - 1.0))
             }
             return Complex(zRe.absoluteValue, zIm.absoluteValue)
         }

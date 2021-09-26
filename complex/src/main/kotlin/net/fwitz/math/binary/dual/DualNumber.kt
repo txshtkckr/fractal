@@ -1,17 +1,16 @@
 package net.fwitz.math.binary.dual
 
 import net.fwitz.math.binary.BinaryNumber
-import net.fwitz.math.binary.BinaryNumber.Companion.boxInf
-import net.fwitz.math.binary.RealMath
-import net.fwitz.math.binary.RealMath.rcos
-import net.fwitz.math.binary.RealMath.rcosh
-import net.fwitz.math.binary.RealMath.rexp
-import net.fwitz.math.binary.RealMath.rsin
-import net.fwitz.math.binary.RealMath.rsinh
-import net.fwitz.math.binary.RealMath.rtanh
 import kotlin.math.absoluteValue
 import kotlin.math.ln
 import kotlin.math.pow
+import kotlin.math.cos as rcos
+import kotlin.math.cosh as rcosh
+import kotlin.math.exp as rexp
+import kotlin.math.sin as rsin
+import kotlin.math.sinh as rsinh
+import kotlin.math.tan as rtan
+import kotlin.math.tanh as rtanh
 
 class DualNumber(
     x: Double,
@@ -183,11 +182,11 @@ class DualNumber(
     //    tan(x + jy) = tan(x) + jy sec2(x)                       [ 1 + tan^2 = sec^2 ]
     override val tan: DualNumber
         get() = when {
-            y == 0.0 -> DualNumber(RealMath.rtan(x), 0.0)
+            y == 0.0 -> DualNumber(rtan(x), 0.0)
             x == 0.0 -> DualNumber(0.0, y)
             else -> {
                 val secx = 1 / rcos(x)
-                DualNumber(RealMath.rtan(x), y * secx * secx)
+                DualNumber(rtan(x), y * secx * secx)
             }
         }
 
