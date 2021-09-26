@@ -8,9 +8,9 @@ import java.awt.Color
 import kotlin.math.sqrt
 
 object Plasma {
-    private val MAX_NUDGE = 256
-    private val INITIAL_STEP = 256
-    private val ONE_OVER_SQRT_2 = 1.0 / sqrt(2.0)
+    private const val MAX_NUDGE = 256
+    private const val INITIAL_STEP = 256
+    private const val SCALE = 0.7071
 
     @JvmStatic
     fun main(args: Array<String>) = CanvasPlot("plasma")
@@ -136,7 +136,7 @@ object Plasma {
 
 
         private fun reduceNudge(maxNudge: Int) = when {
-            maxNudge > 1 -> maxNudge.toDouble().times(ONE_OVER_SQRT_2).toInt()
+            maxNudge > 1 -> maxNudge.toDouble().times(SCALE).toInt()
             else -> 0
         }
 

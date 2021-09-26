@@ -2,10 +2,10 @@ package net.fwitz.math.fractal.ifs
 
 object Ifs {
     val SIERPINSKI_TRIANGLE = IfsParams.ifs(
-        "Sierpinski Triangle", 0.0, 0.25, 0.5,
-        IfsTransform(a = 0.5, b = 0.0, c = 0.0, d = 0.5, e = 0.0, f = 0.0, p = 1),
-        IfsTransform(a = 0.5, b = 0.0, c = 0.0, d = 0.5, e = 1.0, f = 0.0, p = 1),
-        IfsTransform(a = 0.5, b = 0.0, c = 0.0, d = 0.5, e = 0.5, f = 0.5, p = 1),
+        "Sierpinski Triangle", 0.0, -0.065, 0.5,
+        IfsTransform(a = 0.5, b = 0.0, c = 0.0, d = 0.5, e = 0.0, f = 1.0, p = 1),
+        IfsTransform(a = 0.5, b = 0.0, c = 0.0, d = 0.5, e = 1.0, f = 1.0, p = 1),
+        IfsTransform(a = 0.5, b = 0.0, c = 0.0, d = 0.5, e = 0.5, f = 0.133, p = 1)
     )
 
     val SIERPINSKI_CARPET = IfsParams.ifs(
@@ -13,11 +13,20 @@ object Ifs {
         IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.0, f = 0.0, p = 1),
         IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.333, f = 0.0, p = 1),
         IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.667, f = 0.0, p = 1),
-        IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.0, f = 0.333, p = 1),
         IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.667, f = 0.333, p = 1),
-        IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.0, f = 0.667, p = 1),
-        IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.333, f = 0.667, p = 1),
         IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.667, f = 0.667, p = 1),
+        IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.333, f = 0.667, p = 1),
+        IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.0, f = 0.667, p = 1),
+        IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.0, f = 0.333, p = 1)
+    )
+
+    val VICSEK = IfsParams.ifs(
+        "Vicsek", 0.0, 0.0, 0.99,
+        IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.0, f = 0.0, p = 1),
+        IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.667, f = 0.0, p = 1),
+        IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.333, f = 0.333, p = 1),
+        IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.0, f = 0.667, p = 1),
+        IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.667, f = 0.667, p = 1)
     )
 
     val FERN_LEAF = IfsParams.ifs(
@@ -29,18 +38,18 @@ object Ifs {
     )
 
     val TREE = IfsParams.ifs(
-        "Tree", 0.5, 0.25, 1.0,
+        "Tree", 0.5, 0.75, -1.0,
         IfsTransform(a = 0.0, b = 0.0, c = 0.0, d = 0.5, e = 0.0, f = 0.0, p = 1),
         IfsTransform(a = 0.1, b = 0.0, c = 0.0, d = 0.1, e = 0.0, f = 0.2, p = 3),
-        IfsTransform(a = 0.42, b = -0.42, c = 0.42, d = 0.42, e = 0.0, f = 0.2, p = 8),
         IfsTransform(a = 0.42, b = 0.42, c = -0.42, d = 0.42, e = 0.0, f = 0.2, p = 8),
+        IfsTransform(a = 0.42, b = -0.42, c = 0.42, d = 0.42, e = 0.0, f = 0.2, p = 8)
     )
 
     val CANTOR_TREE = IfsParams.ifs(
-        "Cantor Tree", -0.5, -0.5, 1.0,
+        "Cantor Tree", 0.85, 0.85, -0.5,
         IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 0.0, f = 0.0, p = 1),
         IfsTransform(a = 0.333, b = 0.0, c = 0.0, d = 0.333, e = 1.0, f = 0.0, p = 1),
-        IfsTransform(a = 0.667, b = 0.0, c = 0.0, d = 0.667, e = 0.5, f = 0.5, p = 1),
+        IfsTransform(a = 0.667, b = 0.0, c = 0.0, d = 0.667, e = 0.5, f = 0.5, p = 1)
     )
 }
 

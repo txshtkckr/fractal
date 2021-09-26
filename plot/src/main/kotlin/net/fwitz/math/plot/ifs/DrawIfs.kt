@@ -4,12 +4,17 @@ import net.fwitz.math.fractal.ifs.IfsParams
 import net.fwitz.math.fractal.ifs.IfsTransform
 import net.fwitz.math.numth.numbers.Randomizer.RANDOM
 import net.fwitz.math.plot.canvas.CanvasRenderer
-import net.fwitz.math.plot.renderer.palette.PaletteEGA16
+import net.fwitz.math.plot.renderer.palette.Palette
 
-class DrawIfs(params: IfsParams, val iters: Int = DEFAULT_ITERS) : (CanvasRenderer) -> Unit {
+class DrawIfs(
+    params: IfsParams,
+    val palette: Palette,
+    val iters: Int = DEFAULT_ITERS
+) : (CanvasRenderer) -> Unit {
     companion object {
         const val DEFAULT_ITERS = 1_000_000
-        const val REPAINT_EVERY = 100
+        const val SKIP_ITERS = 10
+        const val REPAINT_EVERY = 1000
     }
 
     private val ifs = params.transforms
@@ -32,8 +37,8 @@ class DrawIfs(params: IfsParams, val iters: Int = DEFAULT_ITERS) : (CanvasRender
 
             val px = ((x * scale + xOff) * image.width).toInt()
             val py = ((y * scale + yOff) * image.height).toInt()
-            if (px in 0 until image.width && py in 0 until image.height) {
-                val color = PaletteEGA16.indexExcluding0(attractor + 1)
+            if (px in 0 until image.width && py in 0 until image.height && i > SKIP_ITERS) {
+                val color = palette.indexExcluding0(attractor + 1)
                 image.setRGB(px, py, color.rgb)
             }
             if (i % REPAINT_EVERY == 0) renderer.panel.repaint()
