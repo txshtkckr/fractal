@@ -1,12 +1,8 @@
 package net.fwitz.math.plot.bifurc
 
 import net.fwitz.math.plot.renderer.ImageRendererPanel
-import net.fwitz.math.plot.renderer.ImageRendererPanel.ActionHandler
-import java.awt.event.ActionEvent
 import java.awt.event.MouseEvent
 import java.awt.geom.Point2D
-import java.util.*
-import java.util.function.DoubleFunction
 import java.util.stream.DoubleStream
 import javax.swing.KeyStroke
 import kotlin.system.exitProcess

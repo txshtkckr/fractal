@@ -20,7 +20,7 @@ The code is divided into 5 main modules:
 * numth – A couple of tools related to number theory that I haven't really done much with yet.
 * plot – Most of the UI code, generally split across a "panel" (direct Swing stuff), a plot (connects Swing to the rendering), and a renderer (directs calculations and the drawing process)
 
-Renderers generally do their job in background threads and will usually abort as quickly as possible if they need to start over for some reason (like a changed window size). Some of the plotters know how to divide and conquer the problems (Mandelbrot goes row-at-a-time, for example) while others don't (Plasma makes multiple sequential passes over the whole picture). All of the panels will close if you press "q" or "Escape". The complex number renderers generally have a bit more power, with the ability to use various filter (press "m" or "M" to cycle through them) and zoom out or in with "[" and "]".
+Renderers generally do their job in background threads and will usually abort as quickly as possible if they need to start over for some reason (like a changed window size). Some of the plotters know how to divide and conquer the problems (Mandelbrot goes row-at-a-time, for example) while others don't (Plasma makes multiple sequential passes over the whole picture). All of the panels will close if you press "q" or "Escape". The complex number renderers generally have a bit more power, with the ability to use various filters (press "m" or "M" to cycle through them) and zoom out or in with "[" and "]".
 
 ## Notable main programs:
 
