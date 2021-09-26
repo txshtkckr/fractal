@@ -27,7 +27,7 @@ open class MandelbrotPlot private constructor(
         fun main(args: Array<String>) = MandelbrotPlot().render()
 
         private fun julia(c: Complex, power: Double) = EscapeFunction.builder<Complex>()
-            .step { _, z -> z.pow(power).plus(c) }
+            .step { _, z -> z.pow(power) + c }
             .escapeTest { z -> z.abs2 >= BAILOUT }
             .maxIters(ITERS)
             .build()
@@ -54,7 +54,7 @@ open class MandelbrotPlot private constructor(
     }
 
     private val plot = EscapeTimePlot.complex(name)
-        .computeFn { c -> applyDelegate(c) }
+        .computeFn { c -> delegate(c) }
         .domainX(P_MIN, P_MAX)
         .domainY(Q_MIN, Q_MAX)
         .colorFn(EscapeTimeInterpolator(power, BAILOUT_RADIUS.toDouble(), EscapeTimePalette))
@@ -75,8 +75,6 @@ open class MandelbrotPlot private constructor(
 
     constructor() : this("Mandelbrot (Escape time)", 2.0, true)
     protected constructor(name: String, power: Double) : this(name, power, false)
-
-    private fun applyDelegate(c: Complex) = delegate(c)
 
     fun render() = plot.render()
 

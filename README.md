@@ -30,6 +30,7 @@ Renderers generally do their job in background threads and will usually abort as
 * The same for split-complex numbers and dual numbers, like `SplitExpZ` or `DualExp1OverZ`
 * Mandelbrot-style plots, like `MandelbrotPlot` and `MandelPiPlot`, that can be switched to/from Julia Set mode at the current mouse position by pressing "j".
 * Other assorted escape-time plots, like `BurningShipPlot`, `CollatzPlot`, and `SignOfTheSunGod`.
+* Attraction basin plots for Newton's method and Halley's method.
 * Interated function systems based on affine transformation matrices, with names like `IfsSierpinskiTriangle`, `IfsFern`, and `IfsVicsek`.
 * Regular polygon chaos game fractals, with names like `ChaosTri`, `ChaosPentRejectSame`, and `ChaosDodec`.
 * `Plasma` – Diamond-square algorithm.
