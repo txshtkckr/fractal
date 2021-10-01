@@ -42,12 +42,10 @@ interface EscapeFunction<T : BinaryNumber<T>> : (T) -> EscapeTimeResult<T> {
          * initialization.  For many escape time functions, the initial iteration has a special form that can be
          * handled efficiently as a special case.
          *
-         *
          * For example, the Mandelbrot Set iteration initializes with `0` as its value, and the first iteration
          * consists of squaring that `0` and adding our input parameter `c` to it.  Obviously, squaring
-         * `0` and adding it to anything it pointless.  But the default [.init] function can
+         * `0` and adding it to anything is pointless.  But the default [.init] function can
          * be used as-is to assign `c` as the output of the first iteration, so that's actually perfect.
-         *
          *
          * Except that then we wouldn't normally count that as an iteration, so the iteration count would be off by
          * one.  Using this `includeInit()` method marks `init` as being the first iteration rather than
@@ -59,12 +57,10 @@ interface EscapeFunction<T : BinaryNumber<T>> : (T) -> EscapeTimeResult<T> {
          * Specifies a short-circuit test that if `true` indicates that the value can be assumed to escape
          * without performing any iteration testing on it.
          *
-         *
-         * For example, the Mandelbrot Set's main cardioid and circular nodes are relatively cheap to check for and
-         * and can make up a large portion of some of its images.  Provided there is no other reason to perform the
-         * iteration (such as caring about cycle periods or final values), then testing for these two special cases
-         * can save a lot of time.
-         *
+         * For example, the Mandelbrot Set's main cardioid and circular nodes are relatively cheap to check for
+         * and can make up a large portion of some of its images.  Provided there is no other reason to perform
+         * the iteration (such as caring about cycle periods or final values), then testing for these two special
+         * cases can save a lot of time.
          *
          * If this parameter is not specified, then it is assumed to return false, indicating that all input values
          * must be tested normally.
@@ -93,10 +89,8 @@ interface EscapeFunction<T : BinaryNumber<T>> : (T) -> EscapeTimeResult<T> {
         /**
          * The test that indicates a point has escaped the iteration conditions.
          *
-         *
          * This is just an alternate phrasing of [.containmentTest] for when specifying the exit
          * condition is more intuitive.
-         *
          *
          * Either a [containmentTest][.containmentTest] or an `escapeTest escapeTest`
          * **MUST** be provided.

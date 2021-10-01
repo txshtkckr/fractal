@@ -30,7 +30,7 @@ object Ifs {
     )
 
     val FERN_LEAF = IfsParams.ifs(
-        "Fern leaf", 0.5, 0.05, 0.75,
+        "Fern leaf", 0.5, 1.0, -0.75,
         IfsTransform(a = 0.0, b = 0.0, c = 0.0, d = 0.16, e = 0.0, f = 0.0, p = 1),
         IfsTransform(a = 0.2, b = -0.26, c = 0.23, d = 0.22, e = 0.0, f = 0.2, p = 7),
         IfsTransform(a = -0.15, b = 0.28, c = 0.26, d = 0.24, e = 0.0, f = 0.2, p = 7),
