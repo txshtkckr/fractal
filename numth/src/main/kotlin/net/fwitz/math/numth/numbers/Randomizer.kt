@@ -95,4 +95,16 @@ object Randomizer {
             values[k] = tmp
         }
     }
+
+    fun <T> shuffle(list: List<T>, random: Random = RANDOM): List<T> {
+        val values = MutableList(list.size) { list[it] }
+        for (i in values.size downTo 2) {
+            val j = random.nextInt(i)
+            val k = i - 1
+            val tmp = values[j]
+            values[j] = values[k]
+            values[k] = tmp
+        }
+        return values.toList()
+    }
 }

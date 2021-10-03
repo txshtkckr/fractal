@@ -18,24 +18,29 @@ import kotlin.system.exitProcess
 
 class LyapunovLogisticMap(val s: String) {
     companion object {
-        private val MIN_LEN = 2
-        private val MAX_LEN = 20
-        private val X0 = 0.5
-        private val ITERS = 600
+        private const val MIN_LEN = 2
+        private const val MAX_LEN = 16
+        private const val X0 = 0.5
+        private const val EPSILON = 1e-3
+        private const val ITERS = 600
 
-        private val DEFAULT_MIN_A = 2.0
-        private val DEFAULT_MAX_A = 4.0
-        private val DEFAULT_MIN_B = 2.0
-        private val DEFAULT_MAX_B = 4.0
+        private const val DEFAULT_MIN_A = 0.0
+        private const val DEFAULT_MAX_A = 4.0
+        private const val DEFAULT_MIN_B = 0.0
+        private const val DEFAULT_MAX_B = 4.0
+
+        private const val FILL_STEP = 4
+        private const val REDRAW_GEARING = 17
 
         private fun valid(vararg values: Double): Boolean {
             return DoubleStream.of(*values).allMatch { d: Double -> d.isFinite() }
         }
 
         private fun generateLyapunovString(): String {
+            val len = RANDOM.nextInt(MIN_LEN, MAX_LEN + 1)
             while (true) {
-                val len = RANDOM.nextInt(MIN_LEN, MAX_LEN + 1)
-                val s = (1..len).map { if (RANDOM.nextBoolean()) 'B' else 'A' }.joinToString("")
+                val x = RANDOM.nextLong()
+                val s = (0 until len).map { if (x.shr(it).and(1L) == 1L) 'B' else 'A' }.joinToString("")
                 if (s.contains('A') && s.contains('B')) return s
             }
         }
@@ -81,7 +86,7 @@ class LyapunovLogisticMap(val s: String) {
         keyMap.put(KeyStroke.getKeyStroke('0'), "reset")
 
         val handlers = panel.actionMap
-        handlers.put("quit", ImageRendererPanel.action {
+        handlers.put("quit", action {
             panel.renderer?.shutdown()
             exitProcess(0)
         })
@@ -173,37 +178,100 @@ class LyapunovLogisticMap(val s: String) {
         private val maxB = this@LyapunovLogisticMap.maxB
         private val scaleB = (maxB - minB) / height
 
+        private val aVals = (0 until width).map { minA + scaleA * it }.toList()
+        private val bVals = (0 until height).map { maxB - scaleB * it }.toList()
+
         fun draw() {
-            Randomizer.shuffledInts(width).forEach { x -> async { drawColumn(x) } }
+            val offsets = (0 until FILL_STEP).flatMap { xOff ->
+                (0 until FILL_STEP).map { yOff ->
+                    xOff to yOff
+                }
+            }.toList()
+            Randomizer.shuffle(offsets).forEach { (pxOff, pyOff) ->
+                async {
+                    draw(pxOff, pyOff)
+                }
+            }
         }
 
-        private fun drawColumn(x: Int) {
-            if (abort) return
-            for (y in 0 until height) drawValue(x, y)
+        private fun draw(pxOff: Int, pyOff: Int) {
+            val rand = RANDOM.nextInt(8)
+            when (rand and 4) {
+                0 -> drawRowMajor(pxOff, pyOff, rand)
+                else -> drawColMajor(pxOff, pyOff, rand)
+            }
             renderer.panel.repaint()
         }
 
-        private fun drawValue(px: Int, py: Int) {
-            if (abort) return
-            val lyapunov = calculateLyapunovExponent(px, py)
-            image.setRGB(px, py, selectColor(lyapunov).rgb)
+        private fun drawColMajor(pxOff: Int, pyOff: Int, rand: Int) {
+            var counter = 0
+            for (px in pxSeq(pxOff, rand)) {
+                if (abort) return
+                for (py in pySeq(pyOff, rand)) drawPoint(px, py)
+                if (++counter == REDRAW_GEARING) {
+                    counter = 0
+                    renderer.panel.repaint()
+                }
+            }
         }
 
-        private fun calculateLyapunovExponent(px: Int, py: Int): Double {
-            val a = minA + scaleA * px
-            val b = maxB - scaleB * py
+        private fun drawRowMajor(pxOff: Int, pyOff: Int, rand: Int) {
+            var counter = 0
+            for (py in pySeq(pyOff, rand)) {
+                if (abort) return
+                for (px in pxSeq(pxOff, rand)) drawPoint(px, py)
+                if (++counter == REDRAW_GEARING) {
+                    counter = 0
+                    renderer.panel.repaint()
+                }
+            }
+        }
+
+        private fun drawPoint(px: Int, py: Int) {
+            val a = aVals[px]
+            val b = bVals[py]
+            val lyapunov = calculateLyapunovExponent(a, b)
+            val color = selectColor(lyapunov)
+            image.setRGB(px, py, color.rgb)
+        }
+
+        private fun pxSeq(pxOff: Int, rand: Int) = pointSeq(pxOff, width, (rand and 2) == 0)
+        private fun pySeq(pyOff: Int, rand: Int) = pointSeq(pyOff, height, (rand and 1) == 0)
+
+        private fun pointSeq(offset: Int, bound: Int, invert: Boolean) = when (invert) {
+            false -> offset until bound step FILL_STEP
+            else -> {
+                var start = bound - (bound % FILL_STEP) + offset
+                if (start >= bound) start -= FILL_STEP
+                start downTo 0 step FILL_STEP
+            }
+        }
+
+        private fun calculateLyapunovExponent(a: Double, b: Double): Double {
             val rn = generateSequence(0) { if (it == s.lastIndex) 0 else it + 1 }
                 .map { s[it] }
                 .map { if (it == 'A') a else b }
                 .iterator()
 
-            var x = rn.next() * X0 * (1 - X0)
+
+            var x = X0
+            var r = rn.next()
+            x *= r * (1 - x)
+
+            // If the first iteration didn't go anywhere, then deliberately nudge it off the stable point to
+            // get rid of the artifact that will otherwise show up from the lucky direct hit.
+            if (x == X0) {
+                x += EPSILON
+                x *= r * (1 - x)
+            }
+
             var accumulator = 0.0
             for (k in 1 until ITERS) {
-                val r = rn.next()
+                r = rn.next()
                 x *= r * (1 - x)
-                val term = ln((r * (1.0 - 2.0 * x)).absoluteValue)
-                accumulator += (term - accumulator) / (k + 1)
+                val err = (r * (1.0 - 2.0 * x)).absoluteValue
+                val term = ln(err)
+                if (term.isFinite()) accumulator += (term - accumulator) / (k + 1)
             }
             return accumulator
         }
@@ -211,12 +279,12 @@ class LyapunovLogisticMap(val s: String) {
         private fun selectColor(lyapunov: Double) = when {
             lyapunov.isNaN() -> Color.WHITE
             lyapunov.isInfinite() -> if (lyapunov > 0) Color.YELLOW else Color.BLACK
-            lyapunov > 0 -> c(
+            lyapunov > 0.0 -> c(
                 r = 0.4 + lyapunov * 1.5,
                 g = lyapunov * 1.5,
                 b = 0.0
             )
-            lyapunov < 0 -> c(
+            lyapunov <= 0.0 -> c(
                 r = 1.0 + lyapunov,
                 g = 1.0 + lyapunov,
                 b = 0.2 + (1.0 + lyapunov).coerceAtLeast(0.0)
