@@ -7,6 +7,7 @@ import net.fwitz.math.plot.ifs.DrawIfs
 import net.fwitz.math.plot.renderer.palette.Palette
 import net.fwitz.math.plot.renderer.palette.PaletteContrast
 import java.awt.Color
+import java.awt.event.MouseEvent
 import javax.swing.JFrame
 import javax.swing.WindowConstants
 
@@ -28,19 +29,23 @@ class CanvasPlot(private val title: String) {
             mode: Mode = Mode.NORMAL
         ) = CanvasPlot(title)
             .background(Color.BLACK)
-            .draw(DrawChaosGame(
-                n = n,
-                r = r,
-                iters = iters,
-                palette = palette,
-                mode = mode
-            ))
+            .draw(
+                DrawChaosGame(
+                    n = n,
+                    r = r,
+                    iters = iters,
+                    palette = palette,
+                    mode = mode
+                )
+            )
     }
 
-    protected var drawFn: ((CanvasRenderer) -> Unit)? = null
-    protected var width = DEFAULT_WIDTH
-    protected var height = DEFAULT_HEIGHT
-    protected var background = Color.DARK_GRAY
+    private var drawFn: ((CanvasRenderer) -> Unit)? = null
+    private var width = DEFAULT_WIDTH
+    private var height = DEFAULT_HEIGHT
+    private var background = Color.DARK_GRAY
+    private var onClick: (CanvasPanel, MouseEvent) -> Unit = { _, _ -> }
+
     private var panelDecorator: (CanvasPanel) -> Unit = {}
 
     fun width(width: Int): CanvasPlot = also {
@@ -56,6 +61,7 @@ class CanvasPlot(private val title: String) {
     fun size(width: Int, height: Int) = width(width).height(height)
     fun draw(drawFn: (CanvasRenderer) -> Unit) = also { this.drawFn = drawFn }
     fun background(background: Color) = also { this.background = background }
+    fun onClick(block: (CanvasPanel, MouseEvent) -> Unit) = also { this.onClick = block }
 
     fun decoratePanel(decorator: (CanvasPanel) -> Unit) = also {
         val prev = panelDecorator
@@ -75,5 +81,9 @@ class CanvasPlot(private val title: String) {
         frame.isVisible = true
     }
 
-    protected fun createPanel() = CanvasPanel(drawFn!!, background)
+    private fun createPanel(): CanvasPanel {
+        val panel = CanvasPanel(drawFn!!, background, onClick)
+        decoratePanel(panelDecorator)
+        return panel
+    }
 }

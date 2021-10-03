@@ -20,4 +20,5 @@ class CanvasRenderer(
             if (!pipeline.isShutdown) panel.repaint()
         }
     }
+
 }
