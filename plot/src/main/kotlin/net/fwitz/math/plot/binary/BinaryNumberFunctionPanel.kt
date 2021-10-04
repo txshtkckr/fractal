@@ -93,6 +93,7 @@ abstract class BinaryNumberFunctionPanel<T : BinaryNumber<T>, V>(
         keyMap.put(KeyStroke.getKeyStroke('M'), "filterModeBackward")
         keyMap.put(KeyStroke.getKeyStroke(']'), "zoomIn")
         keyMap.put(KeyStroke.getKeyStroke('['), "zoomOut")
+        keyMap.put(KeyStroke.getKeyStroke('0'), "resetBounds")
 
         val handlers: ActionMap = actionMap
         handlers.put("quit", action {
@@ -103,10 +104,16 @@ abstract class BinaryNumberFunctionPanel<T : BinaryNumber<T>, V>(
         handlers.put("filterModeBackward", action { renderer?.filterModeBackward() })
         handlers.put("zoomIn", action { zoomIn() })
         handlers.put("zoomOut", action { zoomOut() })
+        handlers.put("resetBounds", action { resetBounds() })
     }
 
     override fun mousePressed(e: MouseEvent) {
         if (e.button == 1) getMouseLocationAsValue(e)?.let { z -> center(z) }
+    }
+
+    private fun resetBounds() {
+        setBounds(plot.x1, plot.y1, plot.x2, plot.y2)
+        reset()
     }
 
     companion object {

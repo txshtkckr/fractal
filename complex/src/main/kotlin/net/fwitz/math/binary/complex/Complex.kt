@@ -568,16 +568,16 @@ class Complex(x: Double, y: Double) : BinaryNumber<Complex>(x, y) {
      * positive real axis.  Specifically, this returns the distinct solutions `z` for the equation
      * `z^n = c`, where `c` is this complex number.
      *
-     * The number of roots to return must be at least one (in which case the array contains `this` complex
+     * The number of roots to return must be at least one (in which case the list contains `this` complex
      * number as its only element).  The number may not be larger than [.MAX_ROOTS].  Provided both of these
-     * conditions are met, this method will always return an array with the appropriate number of entries.
+     * conditions are met, this method will always return a list with the appropriate number of entries.
      *
-     * If this complex number is [.ZERO], then the return value is an array with zero as its only element.
+     * If this complex number is [.ZERO], then the return value is a list with zero as its only element.
      * If this complex number is [not-a-number][.isNaN] or [infinite][.isInfinite],
-     * then an empty array is returned.
+     * then an empty list is returned.
      *
      * @param n the exponent, and therefore also the number of roots to be found
-     * @return an array of solutions, as described
+     * @return a list of solutions, as described
      */
     fun roots(n: Int): List<Complex> {
         require(n >= 1) { "n < 1: $n" }

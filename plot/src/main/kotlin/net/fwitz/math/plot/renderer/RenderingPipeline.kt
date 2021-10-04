@@ -13,7 +13,7 @@ import kotlin.jvm.Synchronized
 
 class RenderingPipeline private constructor() {
     companion object {
-        private const val MIN_THREADS = 4
+        private const val MIN_THREADS = 16
         private const val MAX_THREADS = 16
         private const val KEEP_ALIVE = 5L
         private const val CAPACITY = 10000

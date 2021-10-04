@@ -10,10 +10,12 @@ import net.fwitz.math.plot.renderer.ImageRendererPanel.Companion.action
 import java.awt.Color
 import java.awt.event.MouseEvent
 import java.awt.geom.Point2D
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.DoubleStream
 import javax.swing.KeyStroke
 import kotlin.math.absoluteValue
 import kotlin.math.ln
+import kotlin.math.pow
 import kotlin.system.exitProcess
 
 class LyapunovLogisticMap(val s: String) {
@@ -21,8 +23,10 @@ class LyapunovLogisticMap(val s: String) {
         private const val MIN_LEN = 2
         private const val MAX_LEN = 16
         private const val X0 = 0.5
-        private const val EPSILON = 1e-3
-        private const val ITERS = 600
+        private const val DELTA = 1e-3
+        private const val EPSILON = 1e-6
+        private const val WARM_UP_ITERS = 30
+        private const val MAX_ITERS = 5000
 
         private const val DEFAULT_MIN_A = 0.0
         private const val DEFAULT_MAX_A = 4.0
@@ -30,7 +34,7 @@ class LyapunovLogisticMap(val s: String) {
         private const val DEFAULT_MAX_B = 4.0
 
         private const val FILL_STEP = 4
-        private const val REDRAW_GEARING = 17
+        private const val REDRAW_GEARING = 31
 
         private fun valid(vararg values: Double): Boolean {
             return DoubleStream.of(*values).allMatch { d: Double -> d.isFinite() }
@@ -147,6 +151,7 @@ class LyapunovLogisticMap(val s: String) {
             this.minB = minB
             this.maxB = maxB
         }
+        println("New bounds: ($minA, $minB) - ($maxA, $maxB)")
     }
 
     fun getMouseLocationInMap(panel: CanvasPanel, e: MouseEvent): Point2D.Double? {
@@ -194,20 +199,21 @@ class LyapunovLogisticMap(val s: String) {
             }
         }
 
+        private val drawCounter = AtomicInteger(0)
         private fun draw(pxOff: Int, pyOff: Int) {
-            val rand = RANDOM.nextInt(8)
-            when (rand and 4) {
-                0 -> drawRowMajor(pxOff, pyOff, rand)
-                else -> drawColMajor(pxOff, pyOff, rand)
+            val style = drawCounter.incrementAndGet()
+            when (style and 1) {
+                0 -> drawRowMajor(pxOff, pyOff, style)
+                else -> drawColMajor(pxOff, pyOff, style)
             }
             renderer.panel.repaint()
         }
 
-        private fun drawColMajor(pxOff: Int, pyOff: Int, rand: Int) {
+        private fun drawColMajor(pxOff: Int, pyOff: Int, style: Int) {
             var counter = 0
-            for (px in pxSeq(pxOff, rand)) {
+            for (px in pxSeq(pxOff, style)) {
                 if (abort) return
-                for (py in pySeq(pyOff, rand)) drawPoint(px, py)
+                for (py in pySeq(pyOff, style)) drawPoint(px, py)
                 if (++counter == REDRAW_GEARING) {
                     counter = 0
                     renderer.panel.repaint()
@@ -215,11 +221,11 @@ class LyapunovLogisticMap(val s: String) {
             }
         }
 
-        private fun drawRowMajor(pxOff: Int, pyOff: Int, rand: Int) {
+        private fun drawRowMajor(pxOff: Int, pyOff: Int, style: Int) {
             var counter = 0
-            for (py in pySeq(pyOff, rand)) {
+            for (py in pySeq(pyOff, style)) {
                 if (abort) return
-                for (px in pxSeq(pxOff, rand)) drawPoint(px, py)
+                for (px in pxSeq(pxOff, style)) drawPoint(px, py)
                 if (++counter == REDRAW_GEARING) {
                     counter = 0
                     renderer.panel.repaint()
@@ -235,8 +241,8 @@ class LyapunovLogisticMap(val s: String) {
             image.setRGB(px, py, color.rgb)
         }
 
-        private fun pxSeq(pxOff: Int, rand: Int) = pointSeq(pxOff, width, (rand and 2) == 0)
-        private fun pySeq(pyOff: Int, rand: Int) = pointSeq(pyOff, height, (rand and 1) == 0)
+        private fun pxSeq(pxOff: Int, style: Int) = pointSeq(pxOff, width, (style and 2) == 0)
+        private fun pySeq(pyOff: Int, style: Int) = pointSeq(pyOff, height, (style and 2) == 0)
 
         private fun pointSeq(offset: Int, bound: Int, invert: Boolean) = when (invert) {
             false -> offset until bound step FILL_STEP
@@ -253,26 +259,35 @@ class LyapunovLogisticMap(val s: String) {
                 .map { if (it == 'A') a else b }
                 .iterator()
 
-
             var x = X0
-            var r = rn.next()
-            x *= r * (1 - x)
+            for (i in 1..WARM_UP_ITERS * s.length) x *= rn.next() * (1 - x)
 
-            // If the first iteration didn't go anywhere, then deliberately nudge it off the stable point to
-            // get rid of the artifact that will otherwise show up from the lucky direct hit.
-            if (x == X0) {
-                x += EPSILON
-                x *= r * (1 - x)
-            }
-
+            // If the warm-up didn't do anything, then "nudge" the initial value to reduce the surface area
+            // for the stability artifact.
+            if (x == X0) x += DELTA
+            
             var accumulator = 0.0
-            for (k in 1 until ITERS) {
-                r = rn.next()
-                x *= r * (1 - x)
-                val err = (r * (1.0 - 2.0 * x)).absoluteValue
-                val term = ln(err)
-                if (term.isFinite()) accumulator += (term - accumulator) / (k + 1)
+            var strike = 0
+            var k = 1
+            for (i in 0 until MAX_ITERS) {
+                val oldAccumulator = accumulator
+                for (j in s) {
+                    val r = rn.next()
+                    x *= r * (1 - x)
+                    val err = (r * (1.0 - 2.0 * x)).absoluteValue
+                    val term = ln(err)
+                    if (term.isFinite()) accumulator += (term - accumulator) / k
+                    ++k
+                }
+
+                // Bail out if a full series has negligible impact on the value 3 times in a row
+                if (accumulator.minus(oldAccumulator).absoluteValue < EPSILON) {
+                    if (++strike == 3) break
+                } else {
+                    strike = 0
+                }
             }
+
             return accumulator
         }
 
@@ -280,15 +295,17 @@ class LyapunovLogisticMap(val s: String) {
             lyapunov.isNaN() -> Color.WHITE
             lyapunov.isInfinite() -> if (lyapunov > 0) Color.YELLOW else Color.BLACK
             lyapunov > 0.0 -> c(
-                r = 0.4 + lyapunov * 1.5,
-                g = lyapunov * 1.5,
-                b = 0.0
+                r = 0.0,
+                g = 0.0,
+                b = 0.2 + lyapunov * lyapunov * 1.5
             )
-            lyapunov <= 0.0 -> c(
-                r = 1.0 + lyapunov,
-                g = 1.0 + lyapunov,
-                b = 0.2 + (1.0 + lyapunov).coerceAtLeast(0.0)
-            )
+            lyapunov <= 0.0 -> (-lyapunov / 4).pow(0.7).let {
+                c(
+                    r = 1.0 - it,
+                    g = 0.9 - 1.2 * it,
+                    b = 0.0
+                )
+            }
             else -> Color.GREEN
         }
 
