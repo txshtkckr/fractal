@@ -1,61 +1,37 @@
 package net.fwitz.math.numth.numbers
 
 import java.util.*
-import java.util.stream.IntStream
+import kotlin.math.sqrt
 
 object SmallPrimes {
-    private const val STOP_AT = 1000
-    private val SMALL_PRIMES = sieve(STOP_AT)
+    const val SMALL_PRIME_LIMIT = 1000
+    val SMALL_PRIMES = sieveSmallPrimes()
 
-    operator fun iterator(): PrimitiveIterator.OfInt {
-        return SMALL_PRIMES.iterator()
-    }
+    operator fun iterator() = SMALL_PRIMES.iterator()
 
-    fun stream(): IntStream {
-        return SMALL_PRIMES.stream()
-    }
+    fun stream() = SMALL_PRIMES.stream
 
-    fun lessThan(stopAt: Int): IntSet {
-        require(stopAt > 2) { "stopAt <= 2: $stopAt" }
-        return if (stopAt > STOP_AT) sieve(stopAt) else SMALL_PRIMES.truncate(stopAt)
-    }
 
-    private fun sieve(stopAt: Int): IntSet {
-        val primes = BitSet(stopAt)
-        primes[2] = stopAt
+    private fun sieveSmallPrimes(): IntSet {
+        val primes = BitSet(SMALL_PRIME_LIMIT)
+        val sqrt = sqrt(SMALL_PRIME_LIMIT.toDouble()).toInt()
+        primes.set(2, SMALL_PRIME_LIMIT)
+
         var prime = 2
         do {
             var i = prime + prime
-            while (i < stopAt) {
+            while (i < SMALL_PRIME_LIMIT) {
                 primes.clear(i)
                 i += prime
             }
             prime = primes.nextSetBit(prime + 1)
-        } while (prime != -1)
-        return IntSet.ints(primes)
+        } while (prime != -1 && prime <= sqrt)
+        return IntSet.bits(primes, SMALL_PRIME_LIMIT)
     }
+
 
     @JvmStatic
     fun main(args: Array<String>) {
         println(SMALL_PRIMES)
-    }
-
-    private class BitSetIterator private constructor(private val bits: BitSet) : PrimitiveIterator.OfInt {
-        var next: Int = bits.nextSetBit(0)
-
-        override fun nextInt(): Int {
-            val next = next
-            if (next == -1) {
-                throw NoSuchElementException()
-            }
-            this.next = bits.nextSetBit(next + 1)
-            return next
-        }
-
-        override fun hasNext(): Boolean {
-            return next != -1
-        }
-
-        override fun remove() = throw UnsupportedOperationException()
     }
 }

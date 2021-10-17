@@ -4,7 +4,7 @@ import net.fwitz.math.binary.complex.Complex
 import net.fwitz.math.fractal.escape.EscapeFunction
 import net.fwitz.math.plot.binary.escape.EscapeTimePlot
 import net.fwitz.math.plot.binary.escape.color.EscapeTimePaletteFunction
-import net.fwitz.math.plot.renderer.palette.PaletteVGA256
+import net.fwitz.math.plot.renderer.palette.PaletteRandom
 
 /**
  * "First Michael Barnsley Fractal"
@@ -12,7 +12,7 @@ import net.fwitz.math.plot.renderer.palette.PaletteVGA256
  * Stevens, Roger T. (1990). _Advanced Fractal Programming in C_. "Some Barnsley Fractals" (pp. 151-153)
  */
 object Barnsley1 {
-    private const val P_MIN = -0.0
+    private const val P_MIN = 0.0
     private const val P_MAX = 1.0
     private const val Q_MIN = 0.0
     private const val Q_MAX = 1.0
@@ -37,7 +37,7 @@ object Barnsley1 {
     @JvmStatic
     fun main(args: Array<String>) = EscapeTimePlot.complex("Barnsley 1 (Escape time)")
         .computeFn(BARNSLEY_1)
-        .colorFn(EscapeTimePaletteFunction.escapeTime(PaletteVGA256.WithoutLast8))
+        .colorFn(EscapeTimePaletteFunction.escapeTime(PaletteRandom(1000)))
         .domainX(P_MIN, P_MAX)
         .domainY(Q_MIN, Q_MAX)
         .render()

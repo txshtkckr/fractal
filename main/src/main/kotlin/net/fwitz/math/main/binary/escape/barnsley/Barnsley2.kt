@@ -4,7 +4,7 @@ import net.fwitz.math.binary.complex.Complex
 import net.fwitz.math.fractal.escape.EscapeFunction
 import net.fwitz.math.plot.binary.escape.EscapeTimePlot
 import net.fwitz.math.plot.binary.escape.color.EscapeTimePaletteFunction
-import net.fwitz.math.plot.renderer.palette.PaletteVGA256
+import net.fwitz.math.plot.renderer.palette.PaletteRandom
 
 /**
  * "Second Michael Barnsley Fractal"
@@ -38,7 +38,7 @@ object Barnsley2 {
     @JvmStatic
     fun main(args: Array<String>) = EscapeTimePlot.complex("Barnsley 2 (Escape time)")
         .computeFn(BARNSLEY_2)
-        .colorFn(EscapeTimePaletteFunction.escapeTime(PaletteVGA256.WithoutLast8))
+        .colorFn(EscapeTimePaletteFunction.escapeTime(PaletteRandom(1000)))
         .domainX(P_MIN, P_MAX)
         .domainY(Q_MIN, Q_MAX)
         .render()

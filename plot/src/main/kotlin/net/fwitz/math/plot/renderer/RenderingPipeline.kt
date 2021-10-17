@@ -13,8 +13,8 @@ import kotlin.jvm.Synchronized
 
 class RenderingPipeline private constructor() {
     companion object {
-        private const val MIN_THREADS = 16
-        private const val MAX_THREADS = 16
+        private val MIN_THREADS = (Runtime.getRuntime().availableProcessors() * 1.5).toInt()
+        private val MAX_THREADS = Runtime.getRuntime().availableProcessors() * 2
         private const val KEEP_ALIVE = 5L
         private const val CAPACITY = 10000
         private val PIPELINE_COUNTER = AtomicInteger()

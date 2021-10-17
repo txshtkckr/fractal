@@ -1,47 +1,42 @@
 package net.fwitz.math.numth.numbers
 
 import java.util.*
-import java.util.stream.IntStream
 
 class IntSet private constructor(
     private val bits: BitSet,
-    size: Int = bits.length()
-) {
+    val size: Int = bits.length()
+): Sequence<Int> {
     companion object {
-        fun ints(values: BitSet): IntSet {
-            return IntSet(values.clone() as BitSet)
+        fun bits(bits: BitSet, size: Int = bits.length()): IntSet {
+            val copy = bits.clone() as BitSet
+            val firstBitToTrash = copy.nextSetBit(size)
+            if (firstBitToTrash != -1) copy.clear(firstBitToTrash, copy.length())
+            return IntSet(copy, size)
         }
-
-        fun ints(values: IntSet): IntSet {
-            return IntSet(values.bits, values.size)
-        }
     }
 
-    private val size: Int = bits.size()
+    override operator fun iterator(): PrimitiveIterator.OfInt = Itr()
 
-    operator fun iterator(): PrimitiveIterator.OfInt {
-        return Itr()
-    }
+    val cardinality get() = bits.cardinality()
+    val stream get() = bits.stream()
+    val seq get() = iterator().asSequence()
 
-    fun cardinality(): Int {
-        return bits.cardinality()
-    }
-
-    fun size(): Int {
-        return size
-    }
-
-    fun stream(): IntStream {
-        return bits.stream()
-    }
+    fun orInto(bits: BitSet) = bits.or(this.bits)
+    fun andInto(bits: BitSet) = bits.and(this.bits)
 
     fun truncate(newSize: Int): IntSet {
         require(newSize >= 0) { "newSize < 0: $newSize" }
         if (newSize >= size) {
-            require(newSize <= size) { "newSize > size: $newSize > $size" }
+            require(newSize == size) { "newSize > size: $newSize > $size" }
             return this
         }
-        return IntSet(bits, newSize)
+
+        val firstBitOutOfRange = bits.nextSetBit(newSize)
+        if (firstBitOutOfRange == -1) return this
+
+        val copy = bits.clone() as BitSet
+        copy.clear(firstBitOutOfRange, size)
+        return IntSet(copy, newSize)
     }
 
     private var hash = 0
@@ -62,12 +57,11 @@ class IntSet private constructor(
         return size == other.size && hashCode() == other.hashCode() && bits == other.bits
     }
 
-    override fun toString(): String {
-        return bits.toString()
-    }
+    override fun toString() = bits.toString()
 
     private inner class Itr : PrimitiveIterator.OfInt {
         private var next = bits.nextSetBit(0)
+
         override fun nextInt(): Int {
             val bit = next
             if (bit == -1) {

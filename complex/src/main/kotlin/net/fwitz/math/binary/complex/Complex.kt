@@ -19,7 +19,6 @@ import kotlin.math.tanh as rtanh
 /**
  * An immutable complex number.
  *
- *
  * Note that since these values are immutable, a preference has been given to terminology like
  * [plus][.plus] or [times][.times] that connotes a result-yielding
  * operation as opposed to `add`, which might suggest that the operation is mutative and

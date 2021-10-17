@@ -12,6 +12,7 @@ object Z8p15Z4m16 {
         .computeFn(::f)
         .render()
 
+    val n = 8.0
     fun f(z: Complex) = z.pow(8.0) + (z.pow(4.0) * 15) - 16
     fun df(z: Complex) = z.pow(7.0) * 8 + z.pow3 * 60
     fun d2f(z: Complex) = z.pow(6.0).times(56) + z.pow2.times(180)
